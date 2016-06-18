@@ -22,13 +22,13 @@ import cbp.double0negative.xServer.packets.PacketTypes;
 import cbp.double0negative.xServer.util.LogManager;
 
 /**
- * 
+ *
  * @ *
- * 
+ *
  * Authors:
- * 
+ *
  * @author Drew [ https://github.com/Double0negative ]
- * 
+ *
  */
 public class XServer extends JavaPlugin
 {
@@ -62,6 +62,7 @@ public class XServer extends JavaPlugin
 	LogManager log = LogManager.getInstance();
 	static Permission permission = null;
 	private PluginDescriptionFile info;
+	public static HashMap<String, Object> forwardedCommands;
 
 	public void onEnable()
 	{
@@ -89,6 +90,10 @@ public class XServer extends JavaPlugin
 		formats.put("DEATH", getConfig().getString("formats.Death"));
 		formats.put("CONNECT", getConfig().getString("formats.Connect"));
 		formats.put("DISCONNECT", getConfig().getString("formats.Disconnect"));
+		formats.put("ACTION", getConfig().getString("formats.Action"));
+		formats.put("BROADCAST", getConfig().getString("formats.Broadcast"));
+		formats.put("SOCIALSPY", getConfig().getString("formats.SocialSpy"));
+		formats.put("HELPOP", getConfig().getString("formats.HelpOp"));
 
 		formatoveride = getConfig().getBoolean("override.enabled");
 		override.put("MESSAGE", getConfig().getString("override.Message"));
@@ -97,9 +102,14 @@ public class XServer extends JavaPlugin
 		override.put("DEATH", getConfig().getString("override.Death"));
 		override.put("CONNECT", getConfig().getString("override.Connect"));
 		override.put("DISCONNECT", getConfig().getString("override.Disconnect"));
+		override.put("ACTION", getConfig().getString("override.Action"));
+		override.put("BROADCAST", getConfig().getString("override.Broadcast"));
+		override.put("SOCIALSPY", getConfig().getString("override.SocialSpy"));
+		override.put("HELPOP", getConfig().getString("override.HelpOp"));
 
+		forwardedCommands = (HashMap)getConfig().getConfigurationSection("forwardedCommands").getValues(false);
 		setupPermissions();
-		
+
 		if (isHost)
 		{
 			LogManager.getInstance().info("THIS SERVER IS HOST");
@@ -242,7 +252,7 @@ public class XServer extends JavaPlugin
 					{
 						player.sendMessage(xpre + "Already Disconnected!");
 						return true;
-					} 
+					}
 					else
 					{
 						dc();
@@ -284,7 +294,7 @@ public class XServer extends JavaPlugin
 						{
 							player.sendMessage(xpre + "Already Disconnected!");
 							return true;
-						} 
+						}
 						else
 						{
 							hostdc = true;
@@ -403,7 +413,7 @@ public class XServer extends JavaPlugin
 			permsMode = 2;
 		}
 	}
-	   
+
 	   public static boolean checkPerm(Player plr, String node)
 	   {
 		   if(permsMode == 1)

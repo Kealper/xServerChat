@@ -2,7 +2,7 @@
 #set this to true.
 host: false
 
-#If this is not the host server, 
+#If this is not the host server,
 #set the ip of the host
 ip: '0.0.0.0'
 
@@ -33,7 +33,11 @@ formats:
   Death: '[{server}]{username} died'
   Connect: '&9[xServer]{server} has connected'
   Disconnect: '&9[xServer]{server} has disconnected'
-  
+  Action: '* [{server}]{username} {message}'
+  Broadcast: '&d[Broadcast from {server}] {message}'
+  SocialSpy: '[{server}]{username}: {message}'
+  HelpOp: '[HelpOp] [{server}]{username}: {message}'
+
 #If you do not want other servers to be able
 #to set their own formats you can override
 #the formats of the messages being sent here
@@ -44,4 +48,28 @@ override:
   Message: '[{server}]{username}: {message}'
   Death: '&9[{server}]{username} died'
   Disconnect: '&9[xServer]{server} has disconnected'
+  Action: '* [{server}]{username} {message}'
+  Broadcast: '&d[Broadcast from {server}] {message}'
+  SocialSpy: '[{server}]{username}: {message}'
+  HelpOp: '[HelpOp] [{server}]{username}: {message}'
 
+#This section is for commands that should be
+#forwarded to all other servers in the network.
+#All forwarded commands check for the specified permission
+#node on the calling player to determine whether the player
+#has access to that command or not.
+#If you would like a command to be forwarded for everyone
+#by default, just make it require the permission node
+#xserver.message.send
+#If you wish to have commands that require parameters,
+#it would be best to put a space after the command name
+#so when the command is entered without parameters it does
+#not get forwarded to the other servers.
+#These commands are issued as if they were typed into the
+#server console.
+#format is:
+#  command: permission.node
+forwardedCommands:
+  'whitelist ': minecraft.command.whitelist
+  'op ': minecraft.command.op
+  'deop ': minecraft.command.deop

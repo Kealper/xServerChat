@@ -1,7 +1,11 @@
 package cbp.double0negative.xServer.client;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,38 +29,127 @@ public class ChatListener implements Listener
 		this.c = c;
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handleChat(AsyncPlayerChatEvent event)
 	{
 		if (event.isCancelled())
 			return;
 		if (XServer.checkPerm(event.getPlayer(), "xserver.message.send"))
 		{
-			String msg = event.getMessage().replaceAll("(&([a-fk-or0-9]))", "\u00A7$2");
+			String msg = event.getMessage();
+			if (XServer.checkPerm(event.getPlayer(), "essentials.chat.color")) {
+				msg.replaceAll("(&([0-9a-fr]))", "\u00A7$2");
+			}
+			if (XServer.checkPerm(event.getPlayer(), "essentials.chat.format")) {
+				msg.replaceAll("(&([k-or]))", "\u00A7$2");
+			}
 			event.setMessage(msg);
 			c.sendMessage(event.getMessage(), event.getPlayer().getDisplayName());
 		}
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handleCommand(PlayerCommandPreprocessEvent event)
 	{
-
-		if (event.getMessage().equalsIgnoreCase("/reload"))
+		if ((event.getMessage().toLowerCase().startsWith("/me ")) || (event.getMessage().toLowerCase().startsWith("/action ")))
 		{
-			XServer.restartMode = PacketTypes.DC_TYPE_RELOAD;
-		}
-		if (event.getMessage().startsWith("/stop"))
-		{
-			XServer.restartMode = PacketTypes.DC_TYPE_STOP;
+			if (!XServer.checkPerm(event.getPlayer(), "essentials.me")) {
+				return;
+			}
+			if (!XServer.checkPerm(event.getPlayer(), "xserver.message.send")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_ACTION, f));
 		}
 
+		if ((event.getMessage().toLowerCase().startsWith("/broadcast ")) || (event.getMessage().toLowerCase().startsWith("/bc ")))
+		{
+			if (!XServer.checkPerm(event.getPlayer(), "essentials.broadcast")) {
+				return;
+			}
+			if (!XServer.checkPerm(event.getPlayer(), "xserver.message.send")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_BROADCAST, f));
+		}
+
+		if (event.getMessage().toLowerCase().matches("^(/w|/whisper|/t|/tell|/msg|/m|/r|/reply|/mail) (.*)$"))
+		{
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage());
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
+		}
+
+		if ((event.getMessage().toLowerCase().startsWith("/ac ")) || (event.getMessage().toLowerCase().startsWith("/helpop ")))
+		{
+			if (!XServer.checkPerm(event.getPlayer(), "essentials.helpop")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_HELPOP, f));
+		}
+
+		if (event.getMessage().toLowerCase().matches("^(/v|/vanish) (fj|fakejoin)$"))
+		{
+			if (!XServer.checkPerm(event.getPlayer(), "vanish.fakeannounce")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getName());
+			f.put("SERVERNAME", XServer.serverName);
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_JOIN, f));
+		}
+
+		if (event.getMessage().toLowerCase().matches("^(/v|/vanish) (fq|fakequit)$"))
+		{
+			if (!XServer.checkPerm(event.getPlayer(), "vanish.fakeannounce")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getName());
+			f.put("SERVERNAME", XServer.serverName);
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_LEAVE, f));
+		}
+
+		Iterator cmds = XServer.forwardedCommands.entrySet().iterator();
+		while (cmds.hasNext())
+		{
+			Map.Entry cmd = (Map.Entry)cmds.next();
+			if (event.getMessage().toLowerCase().startsWith("/" + ((String)cmd.getKey()).toLowerCase())) {
+				if (XServer.checkPerm(event.getPlayer(), ((String)cmd.getValue())))
+				{
+					HashMap<String, String> f = new HashMap<String, String>();
+					f.put("USERNAME", event.getPlayer().getName());
+					f.put("SERVERNAME", XServer.serverName);
+					f.put("MESSAGE", event.getMessage().substring(1));
+					c.send(new Packet(PacketTypes.PACKET_SERVER_COMMAND, f));
+					break;
+				}
+			}
+		}
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handlePlayerJoin(PlayerJoinEvent event)
 	{
+
+		if (XServer.checkPerm(event.getPlayer(), "vanish.silentjoin") || XServer.checkPerm(event.getPlayer(), "vanish.joinwithoutannounce") || XServer.checkPerm(event.getPlayer(), "essentials.silentjoin")) {
+			return;
+		}
 
 		HashMap<String, String> f = new HashMap<String, String>();
 
@@ -66,9 +159,13 @@ public class ChatListener implements Listener
 
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handlePlayerLeave(PlayerQuitEvent event)
 	{
+
+		if (XServer.checkPerm(event.getPlayer(), "vanish.silentquit") || XServer.checkPerm(event.getPlayer(), "vanish.joinwithoutannounce") || XServer.checkPerm(event.getPlayer(), "essentials.silentquit")) {
+			return;
+		}
 
 		HashMap<String, String> f = new HashMap<String, String>();
 
@@ -77,7 +174,7 @@ public class ChatListener implements Listener
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_LEAVE, f));
 	}
 
-	@EventHandler(priority = EventPriority.MONITOR)
+	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handlePlayerDeath(PlayerDeathEvent event)
 	{
 
@@ -85,17 +182,18 @@ public class ChatListener implements Listener
 
 		f.put("USERNAME", event.getEntity().getDisplayName());
 		f.put("SERVERNAME", XServer.serverName);
+		f.put("MESSAGE", event.getDeathMessage());
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_DEATH, f));
 	}
 
 	/*
 	 * @EventHandler(priority = EventPriority.HIGH) public void
 	 * handleCommand(PlayerCommandPreprocessEvent event){
-	 * 
+	 *
 	 * if(event.getMessage().equalsIgnoreCase("/reload")){ XServer.restartMode =
 	 * PacketTypes.DC_TYPE_RELOAD; } if(event.getMessage().startsWith("/stop")){
 	 * XServer.restartMode = PacketTypes.DC_TYPE_STOP; }
-	 * 
+	 *
 	 * }
 	 */
 }

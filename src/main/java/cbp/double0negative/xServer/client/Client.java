@@ -4,10 +4,13 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Collection;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.scheduler.BukkitScheduler;
 
 import cbp.double0negative.xServer.XServer;
 import cbp.double0negative.xServer.packets.Packet;
@@ -49,20 +52,15 @@ public class Client extends Thread
 			{
 				skt = new Socket(ip, port);
 				open = true;
-				// send(new
-				// Packet(PacketTypes.PACKET_SERVER_NAME,XServer.serverName ));
-				send(new Packet(PacketTypes.PACKET_CLIENT_CONNECTED,
-						XServer.serverName));
-				sendLocalMessage(XServer.aColor + "[XServer]Connected to host");
-				LogManager.getInstance().info(
-						"Client connected to " + ip + ":" + port);
+				send(new Packet(PacketTypes.PACKET_CLIENT_CONNECTED, XServer.serverName));
+				sendLocalMessage(XServer.aColor + "[XServer] Connected to host");
+				LogManager.getInstance().info("Client connected to " + ip + ":" + port);
 
 			} catch (Exception e)
 			{
 				if (!error)
 				{
-					LogManager.getInstance().error(
-							"Failed to create Socket - Client");
+					LogManager.getInstance().error("Failed to create Socket - Client");
 				}
 				error = true;
 			}
@@ -81,9 +79,7 @@ public class Client extends Thread
 					LogManager.getInstance().error("Could not read packet");
 					if (open)
 					{
-						this.p.getServer().broadcastMessage(
-								XServer.eColor
-										+ "[XServer]Lost Connection to Host");
+						this.p.getServer().broadcastMessage(XServer.eColor + "[XServer]Lost Connection to Host");
 					}
 					open = false;
 				}
@@ -116,17 +112,13 @@ public class Client extends Thread
 			} else if (p.getType() == PacketTypes.PACKET_SERVER_DC)
 			{
 				open = false;
-			} else if (p.getType() == PacketTypes.PACKET_PLAYER_JOIN
-					|| p.getType() == PacketTypes.PACKET_PLAYER_LEAVE)
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_JOIN || p.getType() == PacketTypes.PACKET_PLAYER_LEAVE)
 			{
-				String s = (p.getType() == PacketTypes.PACKET_PLAYER_JOIN) ? "LOGIN"
-						: "LOGOUT";
-				sendLocalMessage(XServer.format(p.getFormat(),
-						(HashMap<String, String>) p.getArgs(), s));
+				String s = (p.getType() == PacketTypes.PACKET_PLAYER_JOIN) ? "LOGIN" : "LOGOUT";
+				sendLocalMessage(XServer.format(p.getFormat(), (HashMap<String, String>) p.getArgs(), s));
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_DEATH)
 			{
-				sendLocalMessage(XServer.format(p.getFormat(),
-						(HashMap<String, String>) p.getArgs(), "DEATH"));
+				sendLocalMessage(XServer.format(p.getFormat(), (HashMap<String, String>) p.getArgs(), "DEATH"));
 			} else if (p.getType() == PacketTypes.PACKET_CLIENT_CONNECTED)
 			{
 				HashMap<String, String> form = new HashMap<String, String>();
@@ -136,8 +128,33 @@ public class Client extends Thread
 			{
 				HashMap<String, String> form = new HashMap<String, String>();
 				form.put("SERVERNAME", (String) p.getArgs());
-				sendLocalMessage(XServer.format(p.getFormat(), form,
-						"DISCONNECT"));
+				sendLocalMessage(XServer.format(p.getFormat(), form, "DISCONNECT"));
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_ACTION)
+			{
+				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				sendLocalMessage(XServer.format(p.getFormat(), form, "ACTION"));
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_BROADCAST)
+			{
+				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				sendLocalMessage(XServer.format(p.getFormat(), form, "BROADCAST"));
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_SOCIALSPY)
+			{
+				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy");
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_HELPOP)
+			{
+				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				sendLocalMessage(XServer.format(p.getFormat(), form, "HELPOP"), "essentials.helpop.receive");
+			} else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND)
+			{
+				final HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				this.p.getServer().getScheduler().runTask(this.p, new Runnable()
+				{
+					public void run()
+					{
+						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), form.get("MESSAGE"));
+					}
+				});
 			}
 
 		} catch (Exception e)
@@ -149,9 +166,14 @@ public class Client extends Thread
 
 	public void sendLocalMessage(String s)
 	{
+		sendLocalMessage(s, "xserver.message.receive");
+	}
+
+	public void sendLocalMessage(String s, String perm)
+	{
 		for (Player player : p.getServer().getOnlinePlayers())
 		{
-			if (player.hasPermission("xserver.message.receive")) {
+			if (XServer.checkPerm(player, perm)) {
 				player.sendMessage(s);
 			}
 		}
