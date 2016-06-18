@@ -1,6 +1,6 @@
 name: xServer
 main: cbp.double0negative.xServer.XServer
-authors: [double0negative, MCForger, Stoolbend]
+authors: [double0negative, MCForger, Stoolbend, Kealper]
 version: 0.2.7
 commands:
   xserver:
