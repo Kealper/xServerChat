@@ -40,4 +40,17 @@
             <version>1.5.3</version>
         </dependency>
     </dependencies>
+	<profiles>
+        <profile>
+            <id>plugin</id>
+            <activation>
+                <property>
+                    <name>plugin.build.dir</name>
+                </property>
+            </activation>
+            <build>
+                <directory>${plugin.build.dir}</directory>
+            </build>
+        </profile>
+    </profiles>
 </project>
