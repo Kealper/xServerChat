@@ -17,6 +17,8 @@ import cbp.double0negative.xServer.packets.Packet;
 import cbp.double0negative.xServer.packets.PacketTypes;
 import cbp.double0negative.xServer.util.LogManager;
 
+import me.odium.simplechatchannels.Loader;
+
 public class Client extends Thread
 {
 
@@ -136,15 +138,15 @@ public class Client extends Thread
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_BROADCAST)
 			{
 				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				sendLocalMessage(XServer.format(p.getFormat(), form, "BROADCAST"));
+				sendLocalMessage(XServer.format(p.getFormat(), form, "BROADCAST"), true);
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_SOCIALSPY)
 			{
 				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy");
+				sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy", true);
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_HELPOP)
 			{
 				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				sendLocalMessage(XServer.format(p.getFormat(), form, "HELPOP"), "essentials.helpop.receive");
+				sendLocalMessage(XServer.format(p.getFormat(), form, "HELPOP"), "essentials.helpop.receive", true);
 			} else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND)
 			{
 				final HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
@@ -164,15 +166,36 @@ public class Client extends Thread
 		}
 	}
 
+	public boolean playerIsInSCCChannel(Player player) {
+		if (XServer.sccPluginHook != null) {
+			if (((Loader)XServer.sccPluginHook).InChannel.containsKey(player)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
 	public void sendLocalMessage(String s)
 	{
-		sendLocalMessage(s, "xserver.message.receive");
+		sendLocalMessage(s, "xserver.message.receive", false);
 	}
 
+	public void sendLocalMessage(String s, boolean alwaysSend)
+	{
+		sendLocalMessage(s, "xserver.message.receive", alwaysSend);
+	}
+	
 	public void sendLocalMessage(String s, String perm)
 	{
-		for (Player player : p.getServer().getOnlinePlayers())
-		{
+		sendLocalMessage(s, perm, false);
+	}
+	
+	public void sendLocalMessage(String s, String perm, boolean alwaysSend)
+	{
+		for (Player player: p.getServer().getOnlinePlayers()) {
+			if (playerIsInSCCChannel(player) && !alwaysSend) {
+				continue;
+			}
 			if (XServer.checkPerm(player, perm)) {
 				player.sendMessage(s);
 			}

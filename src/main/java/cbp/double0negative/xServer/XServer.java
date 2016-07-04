@@ -5,6 +5,8 @@ import java.util.List;
 
 import net.milkbowl.vault.permission.Permission;
 
+import me.odium.simplechatchannels.Loader;
+
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -13,6 +15,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.ChatColor;
+import org.bukkit.configuration.file.FileConfiguration;
 
 import cbp.double0negative.xServer.Server.Server;
 import cbp.double0negative.xServer.client.ChatListener;
@@ -63,6 +66,7 @@ public class XServer extends JavaPlugin
 	static Permission permission = null;
 	private PluginDescriptionFile info;
 	public static HashMap<String, Object> forwardedCommands;
+	public static Plugin sccPluginHook;
 
 	public void onEnable()
 	{
@@ -73,17 +77,22 @@ public class XServer extends JavaPlugin
 		info = this.getDescription();
 		version = info.getVersion();
 		authors = info.getAuthors();
-		log.info("XServer Version " + version + " Initializing");
+		log.info("xServerChat Version " + version + " Initializing");
 		log.info("Created by: "+authors.toString());
 
 		getConfig().options().copyDefaults(true);
-		this.saveDefaultConfig();
+		saveDefaultConfig();
 		ip = getConfig().getString("ip");
 		port = getConfig().getInt("port");
 		prefix = getConfig().getString("prefix");
 		isHost = getConfig().getBoolean("host");
 		serverName = getConfig().getString("serverName");
+		sccPluginHook = getServer().getPluginManager().getPlugin("SimpleChatChannels");
 
+		if (sccPluginHook != null) {
+			log.info("SimpleChatChannels found, using SCC API.");
+		}
+		
 		formats.put("MESSAGE", getConfig().getString("formats.Message"));
 		formats.put("LOGIN", getConfig().getString("formats.Login"));
 		formats.put("LOGOUT", getConfig().getString("formats.Logout"));
@@ -118,7 +127,7 @@ public class XServer extends JavaPlugin
 
 		startClient();
 
-		this.getServer().getPluginManager().registerEvents(cl, this);
+		getServer().getPluginManager().registerEvents(cl, this);
 	}
 
 	String s = "";
@@ -229,6 +238,7 @@ public class XServer extends JavaPlugin
 					player.sendMessage(xpre + "/x dc - Disconnect from the host");
 					player.sendMessage(xpre + "/x rc - Connect to the host");
 					player.sendMessage(xpre + "/x v - Display the version");
+					player.sendMessage(xpre + "/x reload - Reloads the configuration");
 					player.sendMessage(xpre + "/x host - List commands for host servers");
 					return true;
 				}
@@ -262,7 +272,7 @@ public class XServer extends JavaPlugin
 						return true;
 					}
 				}
-				if (args[0].equalsIgnoreCase("rc") || args[0].equalsIgnoreCase("reload"))
+				if (args[0].equalsIgnoreCase("rc") || args[0].equalsIgnoreCase("reloadclient"))
 				{
 					reloadClient();
 					player.sendMessage(xpre + "Client Restarted");
@@ -271,6 +281,13 @@ public class XServer extends JavaPlugin
 				if (args[0].equalsIgnoreCase("v") || args[0].equalsIgnoreCase("version"))
 				{
 					player.sendMessage(xpre + ChatColor.YELLOW +"Version: " + version);
+					return true;
+				}
+
+                if (args[0].equalsIgnoreCase("reload"))
+				{
+                    reloadConfig();
+					player.sendMessage(xpre + ChatColor.YELLOW +"Configuration reloaded.");
 					return true;
 				}
 
