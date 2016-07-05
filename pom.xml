@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cbp.double0negative.xServer</groupId>
     <artifactId>xServerChat</artifactId>
-    <version>0.2.8</version>
+    <version>0.2.10</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.5</maven.compiler.source>
@@ -19,6 +19,10 @@
         </resources>
     </build>
     <repositories>
+		<repository>
+			<id>lib</id>
+			<url>file://${basedir}\lib</url>
+		</repository>
         <repository>
             <id>bukkit-repo</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
@@ -38,6 +42,11 @@
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>Vault</artifactId>
             <version>1.5.3</version>
+        </dependency>
+		<dependency>
+            <groupId>me.odium.simplechatchannels</groupId>
+            <artifactId>SimpleChatChannels</artifactId>
+            <version>0.7.6</version>
         </dependency>
     </dependencies>
 	<profiles>
