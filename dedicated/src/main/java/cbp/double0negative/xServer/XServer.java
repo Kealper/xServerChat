@@ -18,12 +18,14 @@ import cbp.double0negative.xServer.util.LogManager;
  * 
  * @author Drew [ https://github.com/Double0negative ]
  * @author Stoolbend [ https://github.com/Stoolbend ]
+ * @author Kealper [ https://github.com/Kealper ]
  * 
  */
 public class XServer
 {
 
-	public static String version = "0.2.8";
+	public static String version = "0.2.10";
+	public static String authors = "Drew, Stoolbend, Kealper";
 	public static String pre = "[XServer] ";
 	public static String xpre = pre;
 	public static String ip;
@@ -151,7 +153,7 @@ public class XServer
 		if (input.equalsIgnoreCase("v") || input.equalsIgnoreCase("version"))
 		{
 			LogManager.info(xpre + "Version: " + version);
-			LogManager.info(xpre + "Dedicated server by Stoolbend");
+			LogManager.info(xpre + "Dedicated server by: "+authors);
 		}
 	}
 	public static void msgStats(Object[][] stats)
