@@ -11,20 +11,20 @@ import cbp.double0negative.xServer.packets.PacketTypes;
 import cbp.double0negative.xServer.util.LogManager;
 
 /**
- * 
+ *
  * @ *
- * 
+ *
  * Authors:
- * 
+ *
  * @author Drew [ https://github.com/Double0negative ]
  * @author Stoolbend [ https://github.com/Stoolbend ]
  * @author Kealper [ https://github.com/Kealper ]
- * 
+ *
  */
 public class XServer
 {
 
-	public static String version = "0.2.10";
+	public static String version = "0.2.11";
 	public static String authors = "Drew, Stoolbend, Kealper";
 	public static String pre = "[XServer] ";
 	public static String xpre = pre;
@@ -41,7 +41,7 @@ public class XServer
 	public static HashMap<String, String> override = new HashMap<String, String>();
 	private static boolean formatoveride = false;
 	public static int port = 33777;
-	
+
 	public static void main(String[] args)
 	{
 
@@ -49,17 +49,17 @@ public class XServer
 		LogManager.info("xServerChat Dedicated Server Version " + version + " Initializing");
 
 		//new yaml config handler
-		
-		
+
+
 		// some ability to log stuff
 		LogManager.info("Starting Server");
-		
+
 		startServer();
-		
+
 		try{
 		    BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
 		    String s2 = bufferRead.readLine();
-	 
+
 		    onCommand(s2);
 		}
 		catch(IOException e)

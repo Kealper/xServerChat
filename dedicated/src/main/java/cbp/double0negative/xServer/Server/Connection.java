@@ -3,9 +3,11 @@ package cbp.double0negative.xServer.Server;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 import cbp.double0negative.xServer.packets.Packet;
 import cbp.double0negative.xServer.packets.PacketTypes;
+import cbp.double0negative.xServer.util.LogManager;
 
 public class Connection extends Thread
 {
@@ -38,7 +40,7 @@ public class Connection extends Thread
 			{
 			}
 		}
-		System.out.println("[THREAD] " + name + " is having its thread closed!");
+		LogManager.info(name + " has disconnected.");
 		interrupt();
 	}
 
@@ -60,12 +62,12 @@ public class Connection extends Thread
 		if (p.getType() == PacketTypes.PACKET_CLIENT_CONNECTED)
 		{
 			name = (String) p.getArgs();
-			System.out.println("[THREAD] " + name + " has connected! Thread ID: " + this.getId());
+			LogManager.info(name + " has connected.");
 			Server.checkIfDupe(p, this);
 		}
 		else if (p.getType() == PacketTypes.PACKET_STATS_REQ)
 		{
-			System.out.println("[THREAD] " + name + " requested stats");
+			LogManager.info(name + " requested stats");
 			Server.genAndSendStats(this);
 		}
 		else if (p.getType() == PacketTypes.PACKET_CLIENT_DC)
@@ -75,6 +77,35 @@ public class Connection extends Thread
 		else
 		{
 			Server.sendPacket(p, this);
+
+			if (p.getType() == PacketTypes.PACKET_MESSAGE) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.println("[" + name + "] " + args.get("USERNAME") + ": " + args.get("MESSAGE"));
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_ACTION) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.println("[" + name + "] " + args.get("USERNAME") + ": " + args.get("MESSAGE"));
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_BROADCAST) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.println("[BROADCAST] " + args.get("MESSAGE"));
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_HELPOP) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.println("[HELPOP] " + args.get("USERNAME") + ": " + args.get("MESSAGE"));
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_JOIN) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.info(args.get("USERNAME") + " has joined server " + name);
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_LEAVE) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.info(args.get("USERNAME") + " has left server " + name);
+			}
+			else if (p.getType() == PacketTypes.PACKET_PLAYER_DEATH) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.info(args.get("MESSAGE") + " on server " + name);
+			}
 		}
 
 	}

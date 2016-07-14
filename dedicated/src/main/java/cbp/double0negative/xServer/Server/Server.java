@@ -25,11 +25,11 @@ public class Server extends Thread
 		try
 		{
 			skt2 = new ServerSocket(XServer.port);
-			LogManager.info("[SERVER] Connections on port "+XServer.port + " please");
+			LogManager.info("Listening on port "+XServer.port);
 		}
 		catch (Exception e)
 		{
-			LogManager.error("[SERVER] Exception in server - could not open port " + XServer.port);
+			LogManager.error("Failed to bind port " + XServer.port + "! Is something using it?");
 		}
 		while (!closed)
 		{
@@ -37,9 +37,7 @@ public class Server extends Thread
 			try
 			{
 
-				LogManager.info("[SERVER] Awaiting connection...");
 				skt = skt2.accept();
-				LogManager.info("[SERVER] Connection made!");
 
 				Connection c = new Connection(skt);
 				c.start();
@@ -51,7 +49,7 @@ public class Server extends Thread
 
 			} catch (Exception e)
 			{
-				LogManager.error("[SERVER] Exception in server");
+				LogManager.error("Exception in server");
 				e.printStackTrace();
 				try
 				{
@@ -77,7 +75,7 @@ public class Server extends Thread
 		}
 		p = null;
 	}
-	
+
 	public static void checkIfDupe(Packet p, Connection c)
 	{
 		for (Connection cl : clients)
@@ -86,7 +84,7 @@ public class Server extends Thread
 			{
 				// Idea here is to close the new connection.
 				// might work better other way round however.
-				System.out.println("[SERVER] Duplicate server name detected!");
+				LogManager.info("Duplicate server name detected! Closing connection...");
 				c.closeConnection();
 			}
 		}
@@ -97,7 +95,6 @@ public class Server extends Thread
 
 	public static void genAndSendStats(Connection c)
 	{
-		System.out.println("[SERVER] Creating Stats");
 		Object[][] stats = new Object[clients.size()][4];
 		for (int a = 0; a < clients.size(); a++)
 		{
@@ -107,7 +104,6 @@ public class Server extends Thread
 			stats[a][2] = i.getSent();
 			stats[a][3] = i.getRecived();
 		}
-		System.out.println("[SERVER] Sending stats");
 		c.send(new Packet(PacketTypes.PACKET_STATS_REPLY, stats));
 		stats = null;
 	}
@@ -130,7 +126,7 @@ public class Server extends Thread
 		}
 		catch (Exception e)
 		{
-			LogManager.error("[SERVER] Could not close connection!");
+			LogManager.error("Could not close connection!");
 		}
 	}
 
