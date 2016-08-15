@@ -43,7 +43,7 @@ public class XServer extends JavaPlugin
 	public static ChatColor aColor = ChatColor.AQUA;
 	public static ChatColor pColor = ChatColor.GOLD;
 	public static ChatColor eColor = ChatColor.DARK_RED;
-	public static String pre = "[XServer] ";
+	public static String pre = "[xServer] ";
 	public static String xpre = pColor + pre;
 	public static String ip;
 	public static int port;
@@ -92,7 +92,7 @@ public class XServer extends JavaPlugin
 		if (sccPluginHook != null) {
 			log.info("SimpleChatChannels found, using SCC API.");
 		}
-		
+
 		formats.put("MESSAGE", getConfig().getString("formats.Message"));
 		formats.put("LOGIN", getConfig().getString("formats.Login"));
 		formats.put("LOGOUT", getConfig().getString("formats.Logout"));
@@ -201,7 +201,7 @@ public class XServer extends JavaPlugin
 		if (!hostdc)
 		{
 			Server.sendPacket(new Packet(PacketTypes.PACKET_MESSAGE, eColor
-					+ "[XServer] Host Disconnecting."), null);
+					+ "[xServer] Host disconnecting."), null);
 			server.closeConnections();
 		}
 	}
@@ -268,14 +268,14 @@ public class XServer extends JavaPlugin
 						dc();
 						dc = true;
 
-						player.sendMessage(xpre	+ "Disconnected. You will be reconnected on next restart or with /x rc");
+						player.sendMessage(xpre	+ "Disconnected. You will be reconnected on next restart or with: /x rc");
 						return true;
 					}
 				}
 				if (args[0].equalsIgnoreCase("rc") || args[0].equalsIgnoreCase("reloadclient"))
 				{
 					reloadClient();
-					player.sendMessage(xpre + "Client Restarted");
+					player.sendMessage(xpre + "Client restarted");
 					return true;
 				}
 				if (args[0].equalsIgnoreCase("v") || args[0].equalsIgnoreCase("version"))
@@ -309,14 +309,14 @@ public class XServer extends JavaPlugin
 						}
 						else if (hostdc)
 						{
-							player.sendMessage(xpre + "Already Disconnected!");
+							player.sendMessage(xpre + "Already disconnected!");
 							return true;
 						}
 						else
 						{
 							hostdc = true;
 							dcServer();
-							player.sendMessage(xpre + "Server Shutdown! Restarting on next restart or with /x host rc");
+							player.sendMessage(xpre + "Server shutdown! Restarting on next restart or with: /x host rc");
 							return true;
 						}
 					}
@@ -330,7 +330,7 @@ public class XServer extends JavaPlugin
 						else
 						{
 							reloadServer();
-							player.sendMessage(xpre + "Server Restarted!");
+							player.sendMessage(xpre + "Server restarted!");
 							return true;
 						}
 
@@ -354,7 +354,7 @@ public class XServer extends JavaPlugin
 	public static void msgStats(Object[][] stats)
 	{
 		stat_req.sendMessage(pColor
-				+ "--------------XServer Chat Stats----------------");
+				+ "--------------xServer Chat Stats----------------");
 		stat_req.sendMessage(pColor
 				+ "Server      Active      Packets Sent            Packets Recived");
 		for (Object[] o : stats)

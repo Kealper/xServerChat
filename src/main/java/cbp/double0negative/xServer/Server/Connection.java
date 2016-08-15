@@ -22,7 +22,7 @@ public class Connection extends Thread
 	{
 
 		this.skt = skt2;
-		System.out.println("Adding Client");
+		System.out.println("Adding client");
 		open = true;
 	}
 

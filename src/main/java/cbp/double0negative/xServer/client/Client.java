@@ -55,7 +55,7 @@ public class Client extends Thread
 				skt = new Socket(ip, port);
 				open = true;
 				send(new Packet(PacketTypes.PACKET_CLIENT_CONNECTED, XServer.serverName));
-				sendLocalMessage(XServer.aColor + "[XServer] Connected to host");
+				sendLocalMessage(XServer.aColor + "[xServer] Connected to host", "xserver.admin", true);
 				LogManager.getInstance().info("Client connected to " + ip + ":" + port);
 
 			} catch (Exception e)
@@ -81,7 +81,7 @@ public class Client extends Thread
 					LogManager.getInstance().error("Could not read packet");
 					if (open)
 					{
-						this.p.getServer().broadcastMessage(XServer.eColor + "[XServer]Lost Connection to Host");
+						sendLocalMessage(XServer.eColor + "[xServer] Lost connection to host", "xserver.admin", true);
 					}
 					open = false;
 				}
@@ -174,7 +174,7 @@ public class Client extends Thread
 		}
 		return false;
 	}
-	
+
 	public void sendLocalMessage(String s)
 	{
 		sendLocalMessage(s, "xserver.message.receive", false);
@@ -184,12 +184,12 @@ public class Client extends Thread
 	{
 		sendLocalMessage(s, "xserver.message.receive", alwaysSend);
 	}
-	
+
 	public void sendLocalMessage(String s, String perm)
 	{
 		sendLocalMessage(s, perm, false);
 	}
-	
+
 	public void sendLocalMessage(String s, String perm, boolean alwaysSend)
 	{
 		for (Player player: p.getServer().getOnlinePlayers()) {

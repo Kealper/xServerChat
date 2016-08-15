@@ -17,7 +17,7 @@ prefix: [xserver]
 
 #Server Name
 
-serverName: 'XServer'
+serverName: 'xServer'
 
 
 #Formats Changes these to customize the
