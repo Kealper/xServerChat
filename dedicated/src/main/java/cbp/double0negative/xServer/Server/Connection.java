@@ -106,6 +106,10 @@ public class Connection extends Thread
 				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
 				LogManager.info(args.get("MESSAGE") + " on server " + name);
 			}
+			else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND) {
+				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
+				LogManager.info(args.get("USERNAME") + " issued global command: /" + args.get("MESSAGE"));
+			}
 		}
 
 	}

@@ -24,7 +24,7 @@ import cbp.double0negative.xServer.util.LogManager;
 public class XServer
 {
 
-	public static String version = "0.2.11";
+	public static String version = "0.2.12";
 	public static String authors = "Drew, Stoolbend, Kealper";
 	public static String pre = "[XServer] ";
 	public static String xpre = pre;
