@@ -69,7 +69,7 @@ override:
 #server console.
 #format is:
 #  command: permission.node
-forwardedCommands:
-  'whitelist ': minecraft.command.whitelist
-  'op ': minecraft.command.op
-  'deop ': minecraft.command.deop
+#forwardedCommands:
+#  'whitelist ': minecraft.command.whitelist
+#  'op ': minecraft.command.op
+#  'deop ': minecraft.command.deop
