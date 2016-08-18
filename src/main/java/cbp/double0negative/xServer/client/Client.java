@@ -106,7 +106,7 @@ public class Client extends Thread
 			if (p.getType() == PacketTypes.PACKET_MESSAGE)
 			{
 				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				if (form.get("CANCELLED") == "false") {
+				if (form.get("CANCELLED").equalsIgnoreCase("false")) {
 					sendLocalMessage(XServer.format(p.getFormat(), form, "MESSAGE"));
 				} else {
 					if (XServer.notifyCancelledChat) {
@@ -161,7 +161,7 @@ public class Client extends Thread
 				boolean ignored = false;
 				Iterator cmds = XServer.ignoredCommands.iterator();
 				while (cmds.hasNext()) {
-					if (form.get("MESSAGE").toLowerCase().startsWith("/" + cmds.next())) {
+					if (form.get("MESSAGE").toLowerCase().startsWith((String)cmds.next())) {
 						ignored = true;
 						break;
 					}
@@ -210,7 +210,7 @@ public class Client extends Thread
 
 	public void sendLocalMessage(String s, String perm, boolean alwaysSend)
 	{
-		if (s == "") {
+		if (s.equals("")) {
 			return;
 		}
 		for (Player player: p.getServer().getOnlinePlayers()) {
@@ -221,16 +221,6 @@ public class Client extends Thread
 				player.sendMessage(s);
 			}
 		}
-	}
-
-	public void sendMessage(String s, String user)
-	{
-		HashMap<String, String> f = new HashMap<String, String>();
-		f.put("MESSAGE", s);
-		f.put("SERVERNAME", XServer.serverName);
-		f.put("USERNAME", user);
-
-		send(new Packet(PacketTypes.PACKET_MESSAGE, f));
 	}
 
 	public void send(Packet p)

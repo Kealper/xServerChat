@@ -26,7 +26,7 @@ public class XServer
 
 	public static String version = "0.2.12";
 	public static String authors = "Drew, Stoolbend, Kealper";
-	public static String pre = "[XServer] ";
+	public static String pre = "[xServer] ";
 	public static String xpre = pre;
 	public static String ip;
 	public static String prefix;
