@@ -104,7 +104,13 @@ public class Client extends Thread
 			if (p.getType() == PacketTypes.PACKET_MESSAGE)
 			{
 				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				sendLocalMessage(XServer.format(p.getFormat(), form, "MESSAGE"));
+				if (form.get("CANCELLED") == "false") {
+					sendLocalMessage(XServer.format(p.getFormat(), form, "MESSAGE"));
+				} else {
+					if (XServer.notifyCancelledChat) {
+						sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
+					}
+				}
 			} else if (p.getType() == PacketTypes.PACKET_STATS_REPLY)
 			{
 				XServer.msgStats((Object[][]) p.getArgs());

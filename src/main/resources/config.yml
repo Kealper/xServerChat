@@ -12,13 +12,15 @@ port: 33777
 
 #Set the prefix to be used before
 #messages sent from this server
-
 prefix: [xserver]
 
 #Server Name
-
 serverName: 'xServer'
 
+#Enables or disables sending of cancelled chat messages to all online players with
+#the xserver.message.cancelled permission or server ops, network-wide. This is useful
+#for allowing server staff to see messages caught by chat filters and similar things.
+notifyCancelledChat: true
 
 #Formats Changes these to customize the
 #way messages COMMING FROM your server look

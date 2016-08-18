@@ -32,8 +32,6 @@ public class ChatListener implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handleChat(AsyncPlayerChatEvent event)
 	{
-		if (event.isCancelled())
-			return;
 		if (XServer.checkPerm(event.getPlayer(), "xserver.message.send"))
 		{
 			String msg = event.getMessage();
@@ -41,10 +39,21 @@ public class ChatListener implements Listener
 				msg.replaceAll("(&([0-9a-fr]))", "\u00A7$2");
 			}
 			if (XServer.checkPerm(event.getPlayer(), "essentials.chat.format")) {
-				msg.replaceAll("(&([k-or]))", "\u00A7$2");
+				msg.replaceAll("(&([l-or]))", "\u00A7$2");
 			}
-			event.setMessage(msg);
-			c.sendMessage(event.getMessage(), event.getPlayer().getDisplayName());
+			event.setMessage(msg); // TODO: Eww.
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("MESSAGE", event.getMessage());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("CANCELLED", "false");
+			if (event.isCancelled()) {
+				f.put("CANCELLED", "true");
+				if (XServer.notifyCancelledChat) {
+					sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
+				}
+			}
+			send(new Packet(PacketTypes.PACKET_MESSAGE, f));
 		}
 
 	}

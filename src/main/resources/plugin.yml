@@ -1,7 +1,7 @@
 name: xServer
 main: cbp.double0negative.xServer.XServer
 authors: [double0negative, MCForger, Stoolbend, Kealper]
-version: 0.2.11
+version: 0.2.12
 commands:
   xserver:
     description: Stats and controls for xserver
@@ -14,6 +14,9 @@ permissions:
   xserver.message.send:
     description: Allows the player to send xServerChat messages
     default: true
+  xserver.message.cancelled:
+    description: Allows the player to be notified of cancelled chat messages
+    default: op
   xserver.admin:
     description: Allows the player to configure xServerChat
     default: op
