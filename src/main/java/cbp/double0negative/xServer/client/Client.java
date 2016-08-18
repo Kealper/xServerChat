@@ -5,6 +5,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Collection;
+import java.util.Iterator;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -156,13 +157,23 @@ public class Client extends Thread
 			} else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND)
 			{
 				final HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
-				this.p.getServer().getScheduler().runTask(this.p, new Runnable()
-				{
-					public void run()
-					{
-						Bukkit.dispatchCommand(Bukkit.getConsoleSender(), form.get("MESSAGE"));
+				boolean ignored = false;
+				Iterator cmds = XServer.ignoredCommands.iterator();
+				while (cmds.hasNext()) {
+					if (form.get("MESSAGE").toLowerCase().startsWith("/" + cmds.next())) {
+						ignored = true;
+						break;
 					}
-				});
+				}
+				if (!ignored) {
+					this.p.getServer().getScheduler().runTask(this.p, new Runnable()
+					{
+						public void run()
+						{
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), form.get("MESSAGE"));
+						}
+					});
+				}
 			}
 
 		} catch (Exception e)

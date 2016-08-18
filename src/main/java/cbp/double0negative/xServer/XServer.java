@@ -68,6 +68,7 @@ public class XServer extends JavaPlugin
 	private PluginDescriptionFile info;
 	public static HashMap<String, Object> forwardedCommands;
 	public static Plugin sccPluginHook;
+	public static List<String> ignoredCommands;
 
 	public void onEnable()
 	{
@@ -89,6 +90,7 @@ public class XServer extends JavaPlugin
 		isHost = getConfig().getBoolean("host");
 		serverName = getConfig().getString("serverName");
 		notifyCancelledChat = getConfig().getBoolean("notifyCancelledChat");
+		ignoredCommands = getConfig().getStringList("ignoredCommands");
 		sccPluginHook = getServer().getPluginManager().getPlugin("SimpleChatChannels");
 
 		if (sccPluginHook != null) {
