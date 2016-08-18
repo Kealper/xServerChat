@@ -27,7 +27,9 @@ notifyCancelledChat: true
 # Note: this means that the messages on your server
 # won't look like this but the messages on the OTHER
 # servers. this allows you to customize the look
-# of your server.
+# of your server. Making an event's format a blank
+# string ('') will prevent that event from being sent
+# to other servers on the network.
 formats:
   Login: '[{server}]{username} has joined the game'
   Logout: '[{server}]{username} has left the game'

@@ -393,6 +393,10 @@ public class XServer extends JavaPlugin
 			str = override.get(key);
 		}
 
+		if (str == "") {
+			return "";
+		}
+
 		str = str.replaceAll("\\{message\\}",
 				(val.get("MESSAGE") != null) ? val.get("MESSAGE") : "");
 		str = str.replaceAll("\\{username\\}",

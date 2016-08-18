@@ -209,6 +209,9 @@ public class Client extends Thread
 
 	public void sendLocalMessage(String s, String perm, boolean alwaysSend)
 	{
+		if (s == "") {
+			return;
+		}
 		for (Player player: p.getServer().getOnlinePlayers()) {
 			if (playerIsInSCCChannel(player) && !alwaysSend) {
 				continue;
