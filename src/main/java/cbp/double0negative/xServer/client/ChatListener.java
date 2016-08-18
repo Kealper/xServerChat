@@ -14,6 +14,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.ChatColor;
 
 import cbp.double0negative.xServer.XServer;
 import cbp.double0negative.xServer.packets.Packet;
@@ -50,10 +51,10 @@ public class ChatListener implements Listener
 			if (event.isCancelled()) {
 				f.put("CANCELLED", "true");
 				if (XServer.notifyCancelledChat) {
-					sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
+					c.sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
 				}
 			}
-			send(new Packet(PacketTypes.PACKET_MESSAGE, f));
+			c.send(new Packet(PacketTypes.PACKET_MESSAGE, f));
 		}
 
 	}
