@@ -110,7 +110,7 @@ public class Client extends Thread
 					sendLocalMessage(XServer.format(p.getFormat(), form, "MESSAGE"));
 				} else {
 					if (XServer.notifyCancelledChat) {
-						sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
+						sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", !XServer.ignoreCancelledSCC);
 					}
 				}
 			} else if (p.getType() == PacketTypes.PACKET_STATS_REPLY)

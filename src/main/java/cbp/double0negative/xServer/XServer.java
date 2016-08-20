@@ -62,6 +62,7 @@ public class XServer extends JavaPlugin
 	public static HashMap<String, String> override = new HashMap<String, String>();
 	private static boolean formatoveride = false;
 	public static boolean notifyCancelledChat = false;
+	public static boolean ignoreCancelledSCC = false;
 	private static int permsMode = 0;
 	LogManager log = LogManager.getInstance();
 	static Permission permission = null;
@@ -90,6 +91,7 @@ public class XServer extends JavaPlugin
 		isHost = getConfig().getBoolean("host");
 		serverName = getConfig().getString("serverName");
 		notifyCancelledChat = getConfig().getBoolean("notifyCancelledChat");
+		ignoreCancelledSCC = getConfig().getBoolean("ignoreCancelledSCC");
 		ignoredCommands = getConfig().getStringList("ignoredCommands");
 		sccPluginHook = getServer().getPluginManager().getPlugin("SimpleChatChannels");
 

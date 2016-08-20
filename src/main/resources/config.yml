@@ -22,6 +22,12 @@ serverName: 'xServer'
 # for allowing server staff to see messages caught by chat filters and similar things.
 notifyCancelledChat: true
 
+# If notifyCancelledChat is set to true, this determines whether players talking in
+# non-default SimpleChatChannels should show a cancelled alert or not. Setting this to
+# false may cause players with the ability to see cancelled notifications to get lots
+# of chat spam if your server makes heavy use of the SimpleChatChannels plugin.
+ignoreCancelledSCC: true
+
 # Formats Changes these to customize the
 # way messages COMMING FROM your server look
 # Note: this means that the messages on your server
