@@ -49,9 +49,12 @@ public class ChatListener implements Listener
 			f.put("USERNAME", event.getPlayer().getDisplayName());
 			f.put("CANCELLED", "false");
 			if (event.isCancelled()) {
+				if (c.playerIsInSCCChannel(event.getPlayer()) && XServer.ignoreCancelledSCC) {
+					return;
+				}
 				f.put("CANCELLED", "true");
 				if (XServer.notifyCancelledChat) {
-					c.sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", !XServer.ignoreCancelledSCC);
+					c.sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
 				}
 			}
 			c.send(new Packet(PacketTypes.PACKET_MESSAGE, f));

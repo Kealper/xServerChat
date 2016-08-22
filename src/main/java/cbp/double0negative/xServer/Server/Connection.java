@@ -37,6 +37,7 @@ public class Connection extends Thread
 				sent++;
 			} catch (Exception e)
 			{
+				Server.closeConnection(this);
 			}
 		}
 

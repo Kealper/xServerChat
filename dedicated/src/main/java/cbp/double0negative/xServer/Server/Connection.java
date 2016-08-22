@@ -38,6 +38,7 @@ public class Connection extends Thread
 				sent++;
 			} catch (Exception e)
 			{
+				closeConnection();
 			}
 		}
 		LogManager.info(name + " has disconnected.");
