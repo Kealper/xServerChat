@@ -81,7 +81,11 @@ public class Connection extends Thread
 
 			if (p.getType() == PacketTypes.PACKET_MESSAGE) {
 				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();
-				LogManager.println("[" + name + "] " + args.get("USERNAME") + ": " + args.get("MESSAGE"));
+				if (args.get("CANCELLED").equalsIgnoreCase("false")) {
+					LogManager.println("[" + name + "] " + args.get("USERNAME") + ": " + args.get("MESSAGE"));
+				} else {
+					LogManager.println("[" + name + "] \u00A7c" + LogManager.stripFormat(args.get("USERNAME") + ": " + args.get("MESSAGE")) + "\u00A7r");
+				}
 			}
 			else if (p.getType() == PacketTypes.PACKET_PLAYER_ACTION) {
 				HashMap <String, String> args = (HashMap <String, String>) p.getArgs();

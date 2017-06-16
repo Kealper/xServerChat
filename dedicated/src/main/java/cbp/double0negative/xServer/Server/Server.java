@@ -3,6 +3,7 @@ package cbp.double0negative.xServer.Server;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import cbp.double0negative.xServer.XServer;
 import cbp.double0negative.xServer.packets.Packet;
@@ -132,9 +133,19 @@ public class Server extends Thread
 
 	public static void closeConnection(Connection c)
 	{
+		String clientName = c.getClientName();
 		c.send(new Packet(PacketTypes.PACKET_SERVER_DC, "SERC"));
 		c.closeConnection();
 		clients.remove(c);
+
+		for (Connection cl : clients) {
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", "");
+			f.put("SERVERNAME", clientName);
+			f.put("MESSAGE", "");
+			cl.send(new Packet(PacketTypes.PACKET_CLIENT_DC, f));
+		}
+
 		/*
 		for(int a = 0; a<clients.size(); a++)
 		{

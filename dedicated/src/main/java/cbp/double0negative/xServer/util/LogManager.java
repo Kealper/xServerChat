@@ -49,4 +49,9 @@ public class LogManager
 		msg = msg.replaceAll("(?i)\u00A7r", (char) 27 + "[0m"); // Reset
 		return msg;
 	}
+
+	public static String stripFormat(String msg) {
+		return msg.replaceAll("\u00A7[0-9a-fklmnor]", "");
+	}
+
 }
