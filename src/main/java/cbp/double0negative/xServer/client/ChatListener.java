@@ -42,19 +42,20 @@ public class ChatListener implements Listener
 			if (XServer.checkPerm(event.getPlayer(), "essentials.chat.format")) {
 				msg.replaceAll("(&([l-or]))", "\u00A7$2");
 			}
-			event.setMessage(msg); // TODO: Eww.
 			HashMap<String, String> f = new HashMap<String, String>();
-			f.put("MESSAGE", event.getMessage());
-			f.put("SERVERNAME", XServer.serverName);
 			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", msg);
 			f.put("CANCELLED", "false");
+			f.put("CHANNEL", "false");
 			if (event.isCancelled()) {
-				if (c.playerIsInSCCChannel(event.getPlayer()) && XServer.ignoreCancelledSCC) {
-					return;
-				}
 				f.put("CANCELLED", "true");
-				if (XServer.notifyCancelledChat) {
-					c.sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
+				if (c.playerIsInChannel(event.getPlayer()) && XServer.ignoreCancelledSCC) {
+					f.put("CHANNEL", "true");
+				} else {
+					if (XServer.notifyCancelledChat) {
+						c.sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + f.get("USERNAME") + ": " + f.get("MESSAGE")), "xserver.message.cancelled", true);
+					}
 				}
 			}
 			c.send(new Packet(PacketTypes.PACKET_MESSAGE, f));
@@ -102,6 +103,7 @@ public class ChatListener implements Listener
 			f.put("SERVERNAME", XServer.serverName);
 			f.put("MESSAGE", event.getMessage());
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
+			c.sendLocalMessage(XServer.format(XServer.formats, f, "SOCIALSPY"), "essentials.socialspy", true);
 		}
 
 		if ((event.getMessage().toLowerCase().startsWith("/ac ")) || (event.getMessage().toLowerCase().startsWith("/helpop ")))
@@ -124,6 +126,7 @@ public class ChatListener implements Listener
 			HashMap<String, String> f = new HashMap<String, String>();
 			f.put("USERNAME", event.getPlayer().getName());
 			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", "");
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_JOIN, f));
 		}
 
@@ -135,6 +138,7 @@ public class ChatListener implements Listener
 			HashMap<String, String> f = new HashMap<String, String>();
 			f.put("USERNAME", event.getPlayer().getName());
 			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", "");
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_LEAVE, f));
 		}
 
@@ -168,6 +172,7 @@ public class ChatListener implements Listener
 
 		f.put("USERNAME", event.getPlayer().getDisplayName());
 		f.put("SERVERNAME", XServer.serverName);
+		f.put("MESSAGE", "");
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_JOIN, f));
 
 	}
@@ -184,12 +189,17 @@ public class ChatListener implements Listener
 
 		f.put("USERNAME", event.getPlayer().getDisplayName());
 		f.put("SERVERNAME", XServer.serverName);
+		f.put("MESSAGE", "");
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_LEAVE, f));
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handlePlayerDeath(PlayerDeathEvent event)
 	{
+		// Some plugins blank the death message to stop the death from showing in chat
+		if (event.getDeathMessage() == null) {
+			return;
+		}
 
 		HashMap<String, String> f = new HashMap<String, String>();
 

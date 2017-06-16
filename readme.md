@@ -1,9 +1,11 @@
-Cross-Server Chat
+Cross-server chat, commands, and more!
 
-Build info
+Please note: Although this is forked from Double0negative/xServerChat, it is not backwards compatible.
+
+Build Info
 ----------
+The plugin is built with Maven, use `mvn clean install` in the main directory to build.
+You can find the final JAR in the `target` directory.
 
-To build the bukkit plugin, use Apache ANT and run with the target set to "plugin".
-To build the dedicated server, use Apache Ant still and run with target "dedi".
-
-Some prebuilt stuff is available in the Out folder above.
+The dedicated server is written in Go, so you'll need some sort of Go toolchain installed and working.
+If you're using the official toolchain, build the server by running `go build` in the `xserverd` directory.

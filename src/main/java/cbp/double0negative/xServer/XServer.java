@@ -1,11 +1,11 @@
 package cbp.double0negative.xServer;
 
+import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import net.milkbowl.vault.permission.Permission;
-
-import me.odium.simplechatchannels.Loader;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
@@ -69,6 +69,7 @@ public class XServer extends JavaPlugin
 	private PluginDescriptionFile info;
 	public static HashMap<String, Object> forwardedCommands;
 	public static Plugin sccPluginHook;
+	public static Plugin scPluginHook;
 	public static List<String> ignoredCommands;
 
 	public void onEnable()
@@ -94,9 +95,14 @@ public class XServer extends JavaPlugin
 		ignoreCancelledSCC = getConfig().getBoolean("ignoreCancelledSCC");
 		ignoredCommands = getConfig().getStringList("ignoredCommands");
 		sccPluginHook = getServer().getPluginManager().getPlugin("SimpleChatChannels");
+		scPluginHook = getServer().getPluginManager().getPlugin("SimpleClans");
 
 		if (sccPluginHook != null) {
 			log.info("SimpleChatChannels found, using SCC API.");
+		}
+
+		if (scPluginHook != null) {
+			log.info("SimpleClans found, using SimpleClans API.");
 		}
 
 		formats.put("MESSAGE", getConfig().getString("formats.Message"));
@@ -172,9 +178,6 @@ public class XServer extends JavaPlugin
 	{
 		if (!dc)
 		{
-			client.send(new Packet(PacketTypes.PACKET_MESSAGE, aColor + prefix
-					+ " Disconnecting. "
-					+ ((!s.equals("")) ? "Reason: " + s : "")));
 			client.stopClient();
 			this.getServer().broadcastMessage(
 					aColor + pre + "Disconnecting from host");
@@ -206,8 +209,6 @@ public class XServer extends JavaPlugin
 	{
 		if (!hostdc)
 		{
-			Server.sendPacket(new Packet(PacketTypes.PACKET_MESSAGE, eColor
-					+ "[xServer] Host disconnecting."), null);
 			server.closeConnections();
 		}
 	}
@@ -383,8 +384,11 @@ public class XServer extends JavaPlugin
 		return s;
 	}
 
-	public static String format(HashMap<String, String> format,
-			HashMap<String, String> val, String key)
+	public static String format(HashMap<String, String> format, HashMap<String, String> val, String key) {
+		return format(format, (Map<String, String>) val, key);
+	}
+
+	public static String format(HashMap<String, String> format, Map<String, String> val, String key)
 	{
 		String str = "";
 		if (!formatoveride)
@@ -399,12 +403,17 @@ public class XServer extends JavaPlugin
 			return "";
 		}
 
-		str = str.replaceAll("\\{message\\}",
-				(val.get("MESSAGE") != null) ? val.get("MESSAGE") : "");
-		str = str.replaceAll("\\{username\\}",
-				(val.get("USERNAME") != null) ? val.get("USERNAME") : "");
-		str = str.replaceAll("\\{server\\}",
-				(val.get("SERVERNAME") != null) ? val.get("SERVERNAME") : "");
+		if (val.get("MESSAGE") != null) {
+			str = str.replaceAll("\\{message\\}", Matcher.quoteReplacement(val.get("MESSAGE")));
+		}
+
+		if (val.get("USERNAME") != null) {
+			str = str.replaceAll("\\{username\\}", Matcher.quoteReplacement(val.get("USERNAME")));
+		}
+
+		if (val.get("SERVERNAME") != null) {
+			str = str.replaceAll("\\{server\\}", Matcher.quoteReplacement(val.get("SERVERNAME")));
+		}
 
 		str = str.replaceAll("(&([a-fk-or0-9]))", "\u00A7$2");
 

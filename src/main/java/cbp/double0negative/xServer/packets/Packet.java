@@ -9,11 +9,11 @@ public class Packet implements Serializable
 {
 
 	/**
-     * 
+     *
      */
 	private static final long serialVersionUID = 1L;
 	private int type;
-	Connection c;
+//	Connection c;
 	Object args;
 
 	HashMap<String, String> formats = new HashMap<String, String>();
@@ -26,10 +26,12 @@ public class Packet implements Serializable
 
 	}
 
+/*
 	public void setConnection(Connection c)
 	{
 		this.c = c;
 	}
+*/
 
 	public int getType()
 	{

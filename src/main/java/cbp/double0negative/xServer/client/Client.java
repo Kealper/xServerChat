@@ -1,11 +1,20 @@
 package cbp.double0negative.xServer.client;
 
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.ByteArrayOutputStream;
 import java.net.Socket;
+import java.util.Map;
 import java.util.HashMap;
 import java.util.Collection;
 import java.util.Iterator;
+import java.lang.Character;
+import java.nio.charset.StandardCharsets;
+import java.lang.reflect.Type;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
@@ -20,14 +29,16 @@ import cbp.double0negative.xServer.packets.PacketTypes;
 import cbp.double0negative.xServer.util.LogManager;
 
 import me.odium.simplechatchannels.Loader;
+import net.sacredlabyrinth.phaed.simpleclans.SimpleClans;
+import net.sacredlabyrinth.phaed.simpleclans.ClanPlayer;
 
 public class Client extends Thread
 {
 
 	private String ip;
 	private int port;
-	private ObjectInputStream in;
-	private ObjectOutputStream out;
+	private InputStream in;
+	private OutputStream out;
 	private Socket skt;
 	private boolean open = false;
 	private boolean closed = false;
@@ -55,8 +66,12 @@ public class Client extends Thread
 			try
 			{
 				skt = new Socket(ip, port);
+				skt.setKeepAlive(true);
+				skt.setTcpNoDelay(true);
 				open = true;
-				send(new Packet(PacketTypes.PACKET_CLIENT_CONNECTED, XServer.serverName));
+				HashMap<String, String> form = new HashMap<String, String>();
+				form.put("SERVERNAME", XServer.serverName);
+				send(new Packet(PacketTypes.PACKET_CLIENT_CONNECTED, form));
 				sendLocalMessage(XServer.aColor + "[xServer] Connected to host", "xserver.admin", true);
 				LogManager.getInstance().info("Client connected to " + ip + ":" + port);
 
@@ -74,8 +89,17 @@ public class Client extends Thread
 			{
 				try
 				{
-					in = new ObjectInputStream(skt.getInputStream());
-					Packet p = (Packet) in.readObject();
+					in = skt.getInputStream();
+					ByteArrayOutputStream json = new ByteArrayOutputStream();
+					while (true) {
+						int b = in.read();
+						if (b == 0) {
+							break;
+						}
+						json.write(b);
+					}
+					Type typeOfPacket = new TypeToken<Packet>() { }.getType();
+					Packet p = new GsonBuilder().create().fromJson(json.toString("UTF-8"), typeOfPacket);
 					parse(p);
 					errLevel = 0;
 				} catch (Exception e)
@@ -105,12 +129,16 @@ public class Client extends Thread
 		{
 			if (p.getType() == PacketTypes.PACKET_MESSAGE)
 			{
-				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				Map<String, String> form = (Map<String, String>) p.getArgs();
 				if (form.get("CANCELLED").equalsIgnoreCase("false")) {
-					sendLocalMessage(XServer.format(p.getFormat(), form, "MESSAGE"));
+					String m = XServer.format(p.getFormat(), form, "MESSAGE");
+					sendLocalMessage(m);
+					Bukkit.getServer().getConsoleSender().sendMessage(m);
 				} else {
-					if (XServer.notifyCancelledChat) {
-						sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
+					if (form.get("CHANNEL").equalsIgnoreCase("false") {
+						if (XServer.notifyCancelledChat) {
+							sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
+						}
 					}
 				}
 			} else if (p.getType() == PacketTypes.PACKET_STATS_REPLY)
@@ -125,39 +153,35 @@ public class Client extends Thread
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_JOIN || p.getType() == PacketTypes.PACKET_PLAYER_LEAVE)
 			{
 				String s = (p.getType() == PacketTypes.PACKET_PLAYER_JOIN) ? "LOGIN" : "LOGOUT";
-				sendLocalMessage(XServer.format(p.getFormat(), (HashMap<String, String>) p.getArgs(), s));
+				sendLocalMessage(XServer.format(p.getFormat(), (Map<String, String>) p.getArgs(), s));
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_DEATH)
 			{
-				sendLocalMessage(XServer.format(p.getFormat(), (HashMap<String, String>) p.getArgs(), "DEATH"));
+				sendLocalMessage(XServer.format(p.getFormat(), (Map<String, String>) p.getArgs(), "DEATH"));
 			} else if (p.getType() == PacketTypes.PACKET_CLIENT_CONNECTED)
 			{
-				HashMap<String, String> form = new HashMap<String, String>();
-				form.put("SERVERNAME", (String) p.getArgs());
-				sendLocalMessage(XServer.format(p.getFormat(), form, "CONNECT"));
+				sendLocalMessage(XServer.format(p.getFormat(), (Map<String, String>) p.getArgs(), "CONNECT"));
 			} else if (p.getType() == PacketTypes.PACKET_CLIENT_DC)
 			{
-				HashMap<String, String> form = new HashMap<String, String>();
-				form.put("SERVERNAME", (String) p.getArgs());
-				sendLocalMessage(XServer.format(p.getFormat(), form, "DISCONNECT"));
+				sendLocalMessage(XServer.format(p.getFormat(), (Map<String, String>) p.getArgs(), "DISCONNECT"));
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_ACTION)
 			{
-				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				Map<String, String> form = (Map<String, String>) p.getArgs();
 				sendLocalMessage(XServer.format(p.getFormat(), form, "ACTION"));
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_BROADCAST)
 			{
-				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				Map<String, String> form = (Map<String, String>) p.getArgs();
 				sendLocalMessage(XServer.format(p.getFormat(), form, "BROADCAST"), true);
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_SOCIALSPY)
 			{
-				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				Map<String, String> form = (Map<String, String>) p.getArgs();
 				sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy", true);
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_HELPOP)
 			{
-				HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				Map<String, String> form = (Map<String, String>) p.getArgs();
 				sendLocalMessage(XServer.format(p.getFormat(), form, "HELPOP"), "essentials.helpop.receive", true);
 			} else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND)
 			{
-				final HashMap<String, String> form = (HashMap<String, String>) p.getArgs();
+				final Map<String, String> form = (Map<String, String>) p.getArgs();
 				boolean ignored = false;
 				Iterator cmds = XServer.ignoredCommands.iterator();
 				while (cmds.hasNext()) {
@@ -184,10 +208,19 @@ public class Client extends Thread
 		}
 	}
 
-	public boolean playerIsInSCCChannel(Player player) {
+	public boolean playerIsInChannel(Player player) {
 		if (XServer.sccPluginHook != null) {
-			if (((Loader)XServer.sccPluginHook).InChannel.containsKey(player)) {
+			if (((Loader) XServer.sccPluginHook).InChannel.containsKey(player)) {
 				return true;
+			}
+		}
+		if (XServer.scPluginHook != null) {
+			SimpleClans sc = (SimpleClans) XServer.scPluginHook;
+			ClanPlayer cp = sc.getClanManager().getClanPlayer(player);
+			if (cp != null) {
+				if (cp.getChannel().equals(ClanPlayer.Channel.CLAN) || cp.getChannel().equals(ClanPlayer.Channel.ALLY)) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -214,7 +247,7 @@ public class Client extends Thread
 			return;
 		}
 		for (Player player: p.getServer().getOnlinePlayers()) {
-			if (playerIsInSCCChannel(player) && !alwaysSend) {
+			if (playerIsInChannel(player) && !alwaysSend) {
 				continue;
 			}
 			if (XServer.checkPerm(player, perm)) {
@@ -228,8 +261,9 @@ public class Client extends Thread
 		try
 		{
 			p.setFormat(XServer.formats);
-			out = new ObjectOutputStream(skt.getOutputStream());
-			out.writeObject(p);
+			String json = new GsonBuilder().create().toJson(p) + "\0";
+			out = skt.getOutputStream();
+			out.write(json.getBytes(StandardCharsets.UTF_8));
 		} catch (Exception e)
 		{
 			LogManager.getInstance().error("Couldn't send packet");
@@ -238,8 +272,9 @@ public class Client extends Thread
 
 	public void closeConnection()
 	{
-
-		send(new Packet(PacketTypes.PACKET_CLIENT_DC, XServer.serverName));
+		HashMap<String, String> form = new HashMap<String, String>();
+		form.put("SERVERNAME", XServer.serverName);
+		send(new Packet(PacketTypes.PACKET_CLIENT_DC, form));
 		try
 		{
 			in.close();
