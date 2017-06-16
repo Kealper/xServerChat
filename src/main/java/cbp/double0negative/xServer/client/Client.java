@@ -135,7 +135,7 @@ public class Client extends Thread
 					sendLocalMessage(m);
 					Bukkit.getServer().getConsoleSender().sendMessage(m);
 				} else {
-					if (form.get("CHANNEL").equalsIgnoreCase("false") {
+					if (form.get("CHANNEL").equalsIgnoreCase("false")) {
 						if (XServer.notifyCancelledChat) {
 							sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
 						}

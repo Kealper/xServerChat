@@ -179,8 +179,7 @@ public class XServer extends JavaPlugin
 		if (!dc)
 		{
 			client.stopClient();
-			this.getServer().broadcastMessage(
-					aColor + pre + "Disconnecting from host");
+			this.client.sendLocalMessage(aColor + pre + "Disconnecting from host", "xserver.admin", true);
 
 		}
 
