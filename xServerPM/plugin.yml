@@ -1,0 +1,15 @@
+name: xServerPM
+main: xServerPM\xServerPM
+version: 1.0.0
+api: 3.0.0-ALPHA6
+author: Kealper
+depend: [PureChat, SimpleAuth]
+
+commands:
+  xserver:
+    description: Main xServerPM command
+    usage: "/xserver <args>"
+  helpop:
+    aliases: [ac]
+    description: Emulates Essentials' helpop command for PMMP
+    usage: "/helpop <message to send>"
