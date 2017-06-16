@@ -46,11 +46,11 @@ func writeLog(text string, level int) {
 		level = 0
 	}
 	timestamp := time.Now().UTC().Format("2006/01/02 15:04:05")
-	fmt.Println(timestamp+" ["+logLevel[level]+"]", colorize(text))
+	fmt.Println(timestamp + " [" + logLevel[level] + "]", colorize(text))
 	if LogFile != "" { // TODO: Sloppy, should be rewritten eventually
-		f, err := os.OpenFile(LogFile, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		f, err := os.OpenFile(LogFile, os.O_APPEND | os.O_WRONLY | os.O_CREATE, 0600)
 		if err == nil {
-			f.WriteString(text+"\n")
+			f.WriteString(timestamp + " [" + logLevel[level] + "]" + text + "\n")
 			f.Close()
 		}
 	}
