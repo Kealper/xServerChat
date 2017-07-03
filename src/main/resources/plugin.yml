@@ -2,11 +2,16 @@ name: xServer
 main: cbp.double0negative.xServer.XServer
 authors: [double0negative, MCForger, Stoolbend, Kealper]
 version: ${project.version}
+softdepend: [Vault, SimpleChatChannels, SimpleClans]
 commands:
   xserver:
     description: Stats and controls for xserver
     usage: /XServer command or /x command
     aliases: [x]
+  opchat:
+    description: Server operator chat channel
+    usage: /opchat message or /a message
+    aliases: [a]
 permissions:
   xserver.message.receive:
     description: Allows the player to receive xServerChat messages
@@ -17,6 +22,15 @@ permissions:
   xserver.message.cancelled:
     description: Allows the player to be notified of cancelled chat messages
     default: op
+  xserver.message.channel:
+    description: Allows the player to be notified of chat channel chat messages
+    default: op
   xserver.admin:
     description: Allows the player to configure xServerChat
+    default: op
+  xserver.opchat.receive:
+    description: Allows the player to receive OpChat messages
+    default: op
+  xserver.opchat.send:
+    description: Allows the player to send OpChat messages
     default: op

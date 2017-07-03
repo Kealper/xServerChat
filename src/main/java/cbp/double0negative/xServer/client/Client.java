@@ -139,6 +139,8 @@ public class Client extends Thread
 						if (XServer.notifyCancelledChat) {
 							sendLocalMessage(ChatColor.RED + ChatColor.stripColor("[Cancelled] " + form.get("USERNAME") + ": " + form.get("MESSAGE")), "xserver.message.cancelled", true);
 						}
+					} else {
+						sendLocalMessage(XServer.format(p.getFormat(), form, "CHANNEL"), "xserver.message.channel", true);
 					}
 				}
 			} else if (p.getType() == PacketTypes.PACKET_STATS_REPLY)
@@ -179,6 +181,10 @@ public class Client extends Thread
 			{
 				Map<String, String> form = (Map<String, String>) p.getArgs();
 				sendLocalMessage(XServer.format(p.getFormat(), form, "HELPOP"), "essentials.helpop.receive", true);
+			} else if (p.getType() == PacketTypes.PACKET_PLAYER_OPCHAT)
+			{
+				Map<String, String> form = (Map<String, String>) p.getArgs();
+				sendLocalMessage(XServer.format(p.getFormat(), form, "OPCHAT"), "xserver.opchat.receive", true);
 			} else if (p.getType() == PacketTypes.PACKET_SERVER_COMMAND)
 			{
 				final Map<String, String> form = (Map<String, String>) p.getArgs();

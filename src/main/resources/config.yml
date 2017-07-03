@@ -46,7 +46,9 @@ formats:
   Action: '* [{server}]{username} {message}'
   Broadcast: '&d[Broadcast from {server}] {message}'
   SocialSpy: '[{server}]{username}: {message}'
+  Channel: '[{server}][Channel]{username}: {message}'
   HelpOp: '[HelpOp] [{server}]{username}: {message}'
+  OpChat: '[OpChat] [{server}]{username}: {message}'
 
 # If you do not want other servers to be able
 # to set their own formats you can override
@@ -61,7 +63,9 @@ override:
   Action: '* [{server}]{username} {message}'
   Broadcast: '&d[Broadcast from {server}] {message}'
   SocialSpy: '[{server}]{username}: {message}'
+  Channel: '[{server}][Channel]{username}: {message}'
   HelpOp: '[HelpOp] [{server}]{username}: {message}'
+  OpChat: '[OpChat] [{server}]{username}: {message}'
 
 # This section is for commands that should be
 # forwarded to all other servers in the network.

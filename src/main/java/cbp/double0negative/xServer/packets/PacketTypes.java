@@ -22,6 +22,7 @@ public class PacketTypes
 	public static int PACKET_PLAYER_BROADCAST = 16;
 	public static int PACKET_PLAYER_SOCIALSPY = 17;
 	public static int PACKET_PLAYER_HELPOP = 18;
+	public static int PACKET_PLAYER_OPCHAT = 19;
 
 	public static int DC_TYPE_RELOAD = 1;
 	public static int DC_TYPE_STOP = 2;

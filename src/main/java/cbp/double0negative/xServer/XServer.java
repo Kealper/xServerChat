@@ -115,6 +115,8 @@ public class XServer extends JavaPlugin
 		formats.put("BROADCAST", getConfig().getString("formats.Broadcast"));
 		formats.put("SOCIALSPY", getConfig().getString("formats.SocialSpy"));
 		formats.put("HELPOP", getConfig().getString("formats.HelpOp"));
+		formats.put("OPCHAT", getConfig().getString("formats.OpChat"));
+		formats.put("CHANNEL", getConfig().getString("formats.Channel"));
 
 		formatoveride = getConfig().getBoolean("override.enabled");
 		override.put("MESSAGE", getConfig().getString("override.Message"));
@@ -127,6 +129,8 @@ public class XServer extends JavaPlugin
 		override.put("BROADCAST", getConfig().getString("override.Broadcast"));
 		override.put("SOCIALSPY", getConfig().getString("override.SocialSpy"));
 		override.put("HELPOP", getConfig().getString("override.HelpOp"));
+		override.put("OPCHAT", getConfig().getString("override.OpChat"));
+		override.put("CHANNEL", getConfig().getString("override.Channel"));
 
 		forwardedCommands = (HashMap)getConfig().getConfigurationSection("forwardedCommands").getValues(false);
 		setupPermissions();
@@ -414,7 +418,7 @@ public class XServer extends JavaPlugin
 			str = str.replaceAll("\\{server\\}", Matcher.quoteReplacement(val.get("SERVERNAME")));
 		}
 
-		str = str.replaceAll("(&([a-fk-or0-9]))", "\u00A7$2");
+		str = str.replaceAll("(&([a-fl-or0-9]))", "\u00A7$2");
 
 		return str;
 	}

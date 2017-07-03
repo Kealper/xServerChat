@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -66,6 +67,16 @@ public class ChatListener implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handleCommand(PlayerCommandPreprocessEvent event)
 	{
+		if (event.getMessage().toLowerCase().startsWith("/. ")) {
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
+			f.put("CANCELLED", "true");
+			f.put("CHANNEL", "true");
+			c.send(new Packet(PacketTypes.PACKET_MESSAGE, f));
+		}
+
 		if ((event.getMessage().toLowerCase().startsWith("/me ")) || (event.getMessage().toLowerCase().startsWith("/action ")))
 		{
 			if (!XServer.checkPerm(event.getPlayer(), "essentials.me")) {
@@ -96,7 +107,7 @@ public class ChatListener implements Listener
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_BROADCAST, f));
 		}
 
-		if (event.getMessage().toLowerCase().matches("^(/w|/whisper|/t|/tell|/msg|/m|/r|/reply|/mail) (.*)$"))
+		if (event.getMessage().toLowerCase().matches("^/(.+?:)?(e)?(w|whisper|t|tell|msg|m|r|reply|mail) (.*)$"))
 		{
 			HashMap<String, String> f = new HashMap<String, String>();
 			f.put("USERNAME", event.getPlayer().getName());
@@ -104,6 +115,19 @@ public class ChatListener implements Listener
 			f.put("MESSAGE", event.getMessage());
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
 			c.sendLocalMessage(XServer.format(XServer.formats, f, "SOCIALSPY"), "essentials.socialspy", true);
+		}
+
+		if ((event.getMessage().toLowerCase().startsWith("/a ")) || (event.getMessage().toLowerCase().startsWith("/opchat ")))
+		{
+			if (!XServer.checkPerm(event.getPlayer(), "xserver.opchat.send")) {
+				return;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_OPCHAT, f));
+			c.sendLocalMessage(XServer.format(XServer.formats, f, "OPCHAT"), "xserver.opchat.receive", true);
 		}
 
 		if ((event.getMessage().toLowerCase().startsWith("/ac ")) || (event.getMessage().toLowerCase().startsWith("/helpop ")))
@@ -145,9 +169,9 @@ public class ChatListener implements Listener
 		Iterator cmds = XServer.forwardedCommands.entrySet().iterator();
 		while (cmds.hasNext())
 		{
-			Map.Entry cmd = (Map.Entry)cmds.next();
-			if (event.getMessage().toLowerCase().startsWith("/" + ((String)cmd.getKey()).toLowerCase())) {
-				if (XServer.checkPerm(event.getPlayer(), ((String)cmd.getValue())))
+			Map.Entry cmd = (Map.Entry) cmds.next();
+			if (Pattern.matches("(?i)^/" + (String) cmd.getKey() + "(.*)", event.getMessage())) {
+				if (XServer.checkPerm(event.getPlayer(), ((String) cmd.getValue())))
 				{
 					HashMap<String, String> f = new HashMap<String, String>();
 					f.put("USERNAME", event.getPlayer().getName());
