@@ -25,7 +25,7 @@ type Client struct {
 }
 
 var (
-	Version    = "1.0.2"
+	Version    = "1.1.0"
 	Clients    = make(map[string] *Client)
 	ClientLock = new(sync.Mutex)
 	LogLevel   = 1
@@ -53,6 +53,7 @@ const (
 	PACKET_PLAYER_SOCIALSPY
 	PACKET_PLAYER_HELPOP
 	PACKET_SERVER_COMMAND
+	PACKET_PLAYER_OPCHAT
 )
 
 func broadcastPacket(p Packet, c *Client) {
@@ -179,6 +180,9 @@ func handleClient(c *net.TCPConn) {
 
 			case PACKET_SERVER_COMMAND:
 				writeLog(packet.Args["USERNAME"] + " issued global server command: " + packet.Args["MESSAGE"], 1)
+
+			case PACKET_PLAYER_OPCHAT:
+				writeLog("[OpChat] " + packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"], 1)
 
 			default:
 				writeLog("Unhandled packet from client " + client.Name, 2)

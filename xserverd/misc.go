@@ -30,7 +30,7 @@ func colorize(s string) string {
 	s = strings.Replace(s, "\u00a7n", "\x1b[4m", -1)    // Underline
 	s = strings.Replace(s, "\u00a7o", "", -1)           // Italic (No support)
 	s = strings.Replace(s, "\u00a7r", "\x1b[0m", -1)    // Reset
-	return s
+	return s + "\x1b[0m"
 }
 
 // Pretty-prints a line in the console log, based on the configuration's selected logging level
