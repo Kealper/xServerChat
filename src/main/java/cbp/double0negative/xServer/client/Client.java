@@ -2,6 +2,7 @@ package cbp.double0negative.xServer.client;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;
 import java.util.Map;
@@ -93,6 +94,11 @@ public class Client extends Thread
 					ByteArrayOutputStream json = new ByteArrayOutputStream();
 					while (true) {
 						int b = in.read();
+						// I probably just suck at Java but the docs say that line above should throw an IOException.
+						// It doesn't so test and throw one here instead.
+						if (b == -1) {
+							throw new IOException();
+						}
 						if (b == 0) {
 							break;
 						}
