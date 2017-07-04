@@ -51,6 +51,7 @@ public class ChatListener implements Listener
 			f.put("CHANNEL", "false");
 			if (event.isCancelled()) {
 				f.put("CANCELLED", "true");
+				f.put("USERNAME", event.getPlayer().getName());
 				if (c.playerIsInChannel(event.getPlayer()) && XServer.ignoreCancelledSCC) {
 					f.put("CHANNEL", "true");
 				} else {
@@ -69,7 +70,7 @@ public class ChatListener implements Listener
 	{
 		if (event.getMessage().toLowerCase().startsWith("/. ")) {
 			HashMap<String, String> f = new HashMap<String, String>();
-			f.put("USERNAME", event.getPlayer().getDisplayName());
+			f.put("USERNAME", event.getPlayer().getName());
 			f.put("SERVERNAME", XServer.serverName);
 			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
 			f.put("CANCELLED", "true");
@@ -115,19 +116,6 @@ public class ChatListener implements Listener
 			f.put("MESSAGE", event.getMessage());
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
 			c.sendLocalMessage(XServer.format(XServer.formats, f, "SOCIALSPY"), "essentials.socialspy", true);
-		}
-
-		if ((event.getMessage().toLowerCase().startsWith("/a ")) || (event.getMessage().toLowerCase().startsWith("/opchat ")))
-		{
-			if (!XServer.checkPerm(event.getPlayer(), "xserver.opchat.send")) {
-				return;
-			}
-			HashMap<String, String> f = new HashMap<String, String>();
-			f.put("USERNAME", event.getPlayer().getDisplayName());
-			f.put("SERVERNAME", XServer.serverName);
-			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
-			c.send(new Packet(PacketTypes.PACKET_PLAYER_OPCHAT, f));
-			c.sendLocalMessage(XServer.format(XServer.formats, f, "OPCHAT"), "xserver.opchat.receive", true);
 		}
 
 		if ((event.getMessage().toLowerCase().startsWith("/ac ")) || (event.getMessage().toLowerCase().startsWith("/helpop ")))

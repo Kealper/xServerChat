@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 
 import net.milkbowl.vault.permission.Permission;
 
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -250,6 +251,7 @@ public class XServer extends JavaPlugin
 					player.sendMessage(xpre + "/x v - Display the version");
 					player.sendMessage(xpre + "/x reload - Reloads the configuration");
 					player.sendMessage(xpre + "/x host - List commands for host servers");
+					player.sendMessage(xpre + "/x cmd - Run the given command across all servers");
 					return true;
 				}
 				else
@@ -346,6 +348,24 @@ public class XServer extends JavaPlugin
 
 					}
 				}
+
+				if (args[0].equalsIgnoreCase("cmd") || args[0].equalsIgnoreCase("command")) {
+					String argsString = String.join(" ", args);
+					HashMap<String, String> f = new HashMap<String, String>();
+					f.put("USERNAME", player.getDisplayName());
+					f.put("SERVERNAME", serverName);
+					f.put("MESSAGE", argsString.substring(argsString.indexOf(" ") + 1));
+					client.send(new Packet(PacketTypes.PACKET_SERVER_COMMAND, f));
+					this.getServer().getScheduler().runTask(this, new Runnable()
+					{
+						public void run()
+						{
+							Bukkit.dispatchCommand(Bukkit.getConsoleSender(), f.get("MESSAGE"));
+						}
+					});
+					return true;
+				}
+
 			}
 			else
 			{
@@ -353,6 +373,21 @@ public class XServer extends JavaPlugin
 				return true;
 			}
 		}
+
+		if (cmd.equalsIgnoreCase("a") || cmd.equalsIgnoreCase("opchat")) {
+			if (!checkPerm(player, "xserver.opchat.send")) {
+				player.sendMessage(xpre + ChatColor.RED + "You don't have permission to do that!");
+				return true;
+			}
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", player.getDisplayName());
+			f.put("SERVERNAME", serverName);
+			f.put("MESSAGE", String.join(" ", args));
+			client.send(new Packet(PacketTypes.PACKET_PLAYER_OPCHAT, f));
+			client.sendLocalMessage(format(formats, f, "OPCHAT"), "xserver.opchat.receive", true);
+			return true;
+		}
+
 		return false;
 	}
 
