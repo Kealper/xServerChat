@@ -104,7 +104,7 @@ public class Client extends Thread
 					errLevel = 0;
 				} catch (Exception e)
 				{
-					LogManager.getInstance().error("Could not read packet");
+					LogManager.getInstance().error("Lost connection to host");
 					if (open)
 					{
 						sendLocalMessage(XServer.eColor + "[xServer] Lost connection to host", "xserver.admin", true);
