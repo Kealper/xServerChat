@@ -6,26 +6,27 @@ use pocketmine\Thread;
 
 class Client extends Thread {
 	
-	const PACKET_NOOP = 0;
-	const PACKET_SERVER_DC = 1;
-	const PACKET_SERVER_NAME = 2;
-	const PACKET_AUTH = 3;
-	const PACKET_MESSAGE = 4;
-	const PACKET_STATS_REQ = 5;
-	const PACKET_STATS_REPLY = 6;
-	const PACKET_PING = 7;
-	const PACKET_PONG = 8;
-	const PACKET_CLIENT_DC = 9;
-	const PACKET_PLAYER_JOIN = 10;
-	const PACKET_PLAYER_LEAVE = 11;
-	const PACKET_CC = 12;
-	const PACKET_PLAYER_DEATH = 13;
+	const PACKET_NOOP             = 0;
+	const PACKET_SERVER_DC        = 1;
+	const PACKET_SERVER_NAME      = 2;
+	const PACKET_AUTH             = 3;
+	const PACKET_MESSAGE          = 4;
+	const PACKET_STATS_REQ        = 5;
+	const PACKET_STATS_REPLY      = 6;
+	const PACKET_PING             = 7;
+	const PACKET_PONG             = 8;
+	const PACKET_CLIENT_DC        = 9;
+	const PACKET_PLAYER_JOIN      = 10;
+	const PACKET_PLAYER_LEAVE     = 11;
+	const PACKET_CC               = 12;
+	const PACKET_PLAYER_DEATH     = 13;
 	const PACKET_CLIENT_CONNECTED = 14;
-	const PACKET_PLAYER_ACTION = 15;
+	const PACKET_PLAYER_ACTION    = 15;
 	const PACKET_PLAYER_BROADCAST = 16;
 	const PACKET_PLAYER_SOCIALSPY = 17;
-	const PACKET_PLAYER_HELPOP = 18;
-	const PACKET_SERVER_COMMAND = 19;
+	const PACKET_PLAYER_HELPOP    = 18;
+	const PACKET_SERVER_COMMAND   = 19;
+	const PACKET_PLAYER_OPCHAT    = 20;
 	
 	public $messageData, $messageType, $messagePerms;
 	private $socket;
@@ -113,7 +114,11 @@ class Client extends Thread {
 						break;
 					}
 					if ($packet->getArg("CANCELLED") == "true") {
-						$this->sendMessage("§c[Cancelled] " . preg_replace("/§[0-9a-frlmnok]/i", "", $this->format($packet, "MESSAGE")), "xserver.message.cancelled", 1);
+						if ($packet->getArg("CHANNEL") == "true") {
+							$this->sendMessage($this->format($packet, "CHANNEL"), "xserver.message.channel", 1);
+						} else {
+							$this->sendMessage("§c[Cancelled] " . preg_replace("/§[0-9a-frlmnok]/i", "", $this->format($packet, "MESSAGE")), "xserver.message.cancelled", 1);
+						}
 						break;
 					}
 					$this->sendMessage($this->format($packet, "MESSAGE"), "xserver.message.receive", 1);
@@ -168,6 +173,10 @@ class Client extends Thread {
 
 				case self::PACKET_PLAYER_HELPOP:	
 					$this->sendMessage($this->format($packet, "HELPOP"), "essentials.helpop.receive", 1);
+					break;
+				
+				case self::PACKET_PLAYER_OPCHAT:	
+					$this->sendMessage($this->format($packet, "OPCHAT"), "xserver.opchat.receive", 1);
 					break;
 
 				case self::PACKET_SERVER_COMMAND:

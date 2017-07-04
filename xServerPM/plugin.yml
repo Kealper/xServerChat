@@ -1,6 +1,6 @@
 name: xServerPM
 main: xServerPM\xServerPM
-version: 1.0.0
+version: 1.1.0
 api: 3.0.0-ALPHA6
 author: Kealper
 depend: [PureChat, SimpleAuth]

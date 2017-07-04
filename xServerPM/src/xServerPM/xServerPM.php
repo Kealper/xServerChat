@@ -37,6 +37,8 @@ class xServerPM extends PluginBase {
 			"CONNECT" => "",
 			"DISCONNECT" => "",
 			"HELPOP" => "&e[HelpOp]&r {username}: &d{message}",
+			"OPCHAT" => "&d[OpChat]&r {username}: &e{message}",
+			"CHANNEL" => "&8[Channel] {username}: {message}",
 		];
 		$this->forwardedCommands = [
 			"whitelist on" => "pocketmine.command.whitelist",
@@ -92,7 +94,8 @@ class xServerPM extends PluginBase {
 				"USERNAME" => $this->getFormattedName($sender),
 				"MESSAGE" => implode(" ", $args),
 			];
-			$localMessage = TextFormat::YELLOW . "[HelpOp] " . TextFormat::RESET . $message["USERNAME"] . TextFormat::RESET . ": " . TextFormat::LIGHT_PURPLE . $message["MESSAGE"];
+			$packet = new Packet($this->client::PACKET_PLAYER_HELPOP, $message);
+			$localMessage = $this->client->format($packet, "HELPOP");
 			$this->getServer()->getLogger()->info(TextFormat::toANSI($localMessage));
 			foreach ($this->getServer()->getOnlinePlayers() as $player) {
 				if (!$this->hasPermission($player, "essentials.helpop.receive")) {
@@ -100,7 +103,31 @@ class xServerPM extends PluginBase {
 				}
 				$player->sendMessage($localMessage);
 			}
-			$packet = new Packet($this->client::PACKET_PLAYER_HELPOP, $message);
+			$this->client->send($packet);
+			return true;
+		}
+		
+		case "a":
+		case "opchat":
+			if (!$this->hasPermission($sender, "xserver.opchat.send")) {
+				$sender->sendMessage($this->pluginTag . TextFormat::RED . "You don't have permission to use this.");
+				return false;
+			}
+			$message = [
+				"SERVERNAME" => $this->name,
+				"USERNAME" => $this->getFormattedName($sender),
+				"MESSAGE" => implode(" ", $args),
+			];
+			
+			$packet = new Packet($this->client::PACKET_PLAYER_OPCHAT, $message);
+			$localMessage = $this->client->format($packet, "OPCHAT");
+			$this->getServer()->getLogger()->info(TextFormat::toANSI($localMessage));
+			foreach ($this->getServer()->getOnlinePlayers() as $player) {
+				if (!$this->hasPermission($player, "xserver.opchat.receive")) {
+					continue;
+				}
+				$player->sendMessage($localMessage);
+			}
 			$this->client->send($packet);
 			return true;
 		}
