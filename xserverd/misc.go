@@ -7,6 +7,7 @@ import (
 	"time"
 )
 
+// Converts Minecraft color formatting into ANSI formatting
 func colorize(s string) string {
 	s = strings.Replace(s, "\u00a70", "\x1b[0;30m", -1) // Black
 	s = strings.Replace(s, "\u00a71", "\x1b[0;34m", -1) // Blue
@@ -31,6 +32,33 @@ func colorize(s string) string {
 	s = strings.Replace(s, "\u00a7o", "", -1)           // Italic (No support)
 	s = strings.Replace(s, "\u00a7r", "\x1b[0m", -1)    // Reset
 	return s + "\x1b[0m"
+}
+
+// Removes Minecraft color formatting codes
+func decolorize(s string) string {
+	s = strings.Replace(s, "\u00a70", "", -1) // Black
+	s = strings.Replace(s, "\u00a71", "", -1) // Blue
+	s = strings.Replace(s, "\u00a72", "", -1) // Green
+	s = strings.Replace(s, "\u00a73", "", -1) // Cyan
+	s = strings.Replace(s, "\u00a74", "", -1) // Red
+	s = strings.Replace(s, "\u00a75", "", -1) // Purple
+	s = strings.Replace(s, "\u00a76", "", -1) // Gold
+	s = strings.Replace(s, "\u00a77", "", -1) // Gray
+	s = strings.Replace(s, "\u00a78", "", -1) // Dark Gray
+	s = strings.Replace(s, "\u00a79", "", -1) // Light Blue
+	s = strings.Replace(s, "\u00a7a", "", -1) // Light Green
+	s = strings.Replace(s, "\u00a7b", "", -1) // Light Cyan
+	s = strings.Replace(s, "\u00a7c", "", -1) // Light Red
+	s = strings.Replace(s, "\u00a7d", "", -1) // Light Purple
+	s = strings.Replace(s, "\u00a7e", "", -1) // Yellow
+	s = strings.Replace(s, "\u00a7f", "", -1) // White
+	s = strings.Replace(s, "\u00a7k", "", -1) // Obfuscated
+	s = strings.Replace(s, "\u00a7l", "", -1) // Bold
+	s = strings.Replace(s, "\u00a7m", "", -1) // Strikethrough
+	s = strings.Replace(s, "\u00a7n", "", -1) // Underline
+	s = strings.Replace(s, "\u00a7o", "", -1) // Italic
+	s = strings.Replace(s, "\u00a7r", "", -1) // Reset
+	return s
 }
 
 // Pretty-prints a line in the console log, based on the configuration's selected logging level

@@ -134,7 +134,15 @@ func handleClient(c *net.TCPConn) {
 				continue
 
 			case PACKET_MESSAGE:
-				writeLog("[" + packet.Args["SERVERNAME"] + "] " + packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"], 1)
+				if packet.Args["CANCELLED"] == "true" {
+					if packet.Args["CHANNEL"] == "true" {
+						writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a78" + decolorize(packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"])), 1)
+					} else {
+						writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a7c" + decolorize(packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"])), 1)
+					}
+				} else {
+					writeLog("[" + packet.Args["SERVERNAME"] + "] " + packet.Args["USERNAME"] + "\u00a7f: " + packet.Args["MESSAGE"], 1)
+				}
 
 			case PACKET_STATS_REQ:
 				continue
@@ -174,15 +182,16 @@ func handleClient(c *net.TCPConn) {
 				writeLog("[BROADCAST] " + packet.Args["MESSAGE"], 1)
 
 			case PACKET_PLAYER_SOCIALSPY:
+				writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a77" + decolorize(packet.Args["USERNAME"] + "\u00a7f: " + packet.Args["MESSAGE"])), 1)
 
 			case PACKET_PLAYER_HELPOP:
-				writeLog("[HelpOp] " + packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"], 1)
+				writeLog("[HelpOp] " + colorize(packet.Args["USERNAME"] + "\u00a7f: " + "\u00a7d" + decolorize(packet.Args["MESSAGE"])), 1)
 
 			case PACKET_SERVER_COMMAND:
 				writeLog(packet.Args["USERNAME"] + " issued global server command: " + packet.Args["MESSAGE"], 1)
 
 			case PACKET_PLAYER_OPCHAT:
-				writeLog("[OpChat] " + packet.Args["USERNAME"] + ": " + packet.Args["MESSAGE"], 1)
+				writeLog("[OpChat] " + colorize(packet.Args["USERNAME"] + "\u00a7f: " + "\u00a7e" + decolorize(packet.Args["MESSAGE"])), 1)
 
 			default:
 				writeLog("Unhandled packet from client " + client.Name, 2)
