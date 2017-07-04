@@ -95,6 +95,7 @@ class xServerPM extends PluginBase {
 				"MESSAGE" => implode(" ", $args),
 			];
 			$packet = new Packet($this->client::PACKET_PLAYER_HELPOP, $message);
+			$packet->setFormats($this->formats);
 			$localMessage = $this->client->format($packet, "HELPOP");
 			$this->getServer()->getLogger()->info(TextFormat::toANSI($localMessage));
 			foreach ($this->getServer()->getOnlinePlayers() as $player) {
@@ -105,7 +106,6 @@ class xServerPM extends PluginBase {
 			}
 			$this->client->send($packet);
 			return true;
-		}
 		
 		case "a":
 		case "opchat":
@@ -120,6 +120,7 @@ class xServerPM extends PluginBase {
 			];
 			
 			$packet = new Packet($this->client::PACKET_PLAYER_OPCHAT, $message);
+			$packet->setFormats($this->formats);
 			$localMessage = $this->client->format($packet, "OPCHAT");
 			$this->getServer()->getLogger()->info(TextFormat::toANSI($localMessage));
 			foreach ($this->getServer()->getOnlinePlayers() as $player) {

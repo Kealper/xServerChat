@@ -13,3 +13,7 @@ commands:
     aliases: [ac]
     description: Emulates Essentials' helpop command for PMMP
     usage: "/helpop <message to send>"
+  opchat:
+    aliases: [a]
+    description: Separate chat channel for server ops
+    usage: "/opchat <message to send>"
