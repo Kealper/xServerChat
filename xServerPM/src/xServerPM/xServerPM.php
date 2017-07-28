@@ -11,16 +11,16 @@ use pocketmine\Player;
 use SimpleAuth\SimpleAuth;
 
 class xServerPM extends PluginBase {
-	
+
 	private $client, $listener;
 	private $address, $port, $name, $formats, $forwardedCommands, $ignoredCommands;
 	private $pluginTag;
 	private $pureChat, $simpleAuth;
-	
+
 	public function onLoad() {
 		ini_set('mbstring.substitute_character', "none");
 	}
-	
+
 	public function onEnable() {
 		// These are ugly and should be moved out into config options
 		$this->address = "bungee.famcraft.com";
@@ -63,7 +63,7 @@ class xServerPM extends PluginBase {
 			"ns " => "pocketmine.command.op",
 		];
 		$this->ignoredCommands = "whitelist |pex |nick |mycmd-reload |spawn ";
-		
+
 		$this->pluginTag = TextFormat::YELLOW . "[xServer] " . TextFormat::RESET;
 		$this->pureChat = $this->getServer()->getPluginManager()->getPlugin("PureChat");
 		$this->simpleAuth = $this->getServer()->getPluginManager()->getPlugin("SimpleAuth");
@@ -72,17 +72,17 @@ class xServerPM extends PluginBase {
 		$this->getServer()->getScheduler()->scheduleRepeatingTask(new Tasks($this), 1);
 		$this->client = new Client($this->address, $this->port, $this->name, $this->formats);
 	}
-	
+
 	public function onDisable() {
-		
+
 	}
-	
-	public function onCommand(CommandSender $sender, Command $command, $label, array $args) {
+
+	public function onCommand(CommandSender $sender, Command $command, string $label, array $args): bool {
 		switch ($command->getName()) {
 		case "xserver":
 			// TODO: This.
 			return true;
-		
+
 		case "ac":
 		case "helpop":
 			if (!$this->hasPermission($sender, "essentials.helpop")) {
@@ -106,7 +106,7 @@ class xServerPM extends PluginBase {
 			}
 			$this->client->send($packet);
 			return true;
-		
+
 		case "a":
 		case "opchat":
 			if (!$this->hasPermission($sender, "xserver.opchat.send")) {
@@ -118,7 +118,7 @@ class xServerPM extends PluginBase {
 				"USERNAME" => $this->getFormattedName($sender),
 				"MESSAGE" => implode(" ", $args),
 			];
-			
+
 			$packet = new Packet($this->client::PACKET_PLAYER_OPCHAT, $message);
 			$packet->setFormats($this->formats);
 			$localMessage = $this->client->format($packet, "OPCHAT");
@@ -133,7 +133,7 @@ class xServerPM extends PluginBase {
 			return true;
 		}
 	}
-	
+
 	public function getFormattedName($sender) {
 		$name = $sender->getName();
 		if ($sender instanceof Player) {
@@ -143,7 +143,7 @@ class xServerPM extends PluginBase {
 		}
 		return $name;
 	}
-	
+
 	public function getClient() {
 		return $this->client;
 	}
@@ -151,15 +151,15 @@ class xServerPM extends PluginBase {
 	public function getListener() {
 		return $this->listener;
 	}
-	
+
 	public function getClientName() {
 		return $this->name;
 	}
-	
+
 	public function getForwardedCommands() {
 		return $this->forwardedCommands;
 	}
-	
+
 	public function hasPermission($player, $permission, $bypassAuth = false) {
 		if (!$this->simpleAuth->isPlayerAuthenticated($player) && !$bypassAuth) {
 			return false;
@@ -172,17 +172,17 @@ class xServerPM extends PluginBase {
 		}
 		return false;
 	}
-	
+
 	private function stripFormat($message) {
-		return preg_replace("/ยง[0-9a-frlmnok]/i", "", $message);
+		return preg_replace("/ง[0-9a-frlmnok]/i", "", $message);
 	}
-	
+
 	private function stripUnicode($message) {
-		$message = preg_replace("/ยง([0-9a-frlmnok])/i", "\x01$1", $message);
+		$message = preg_replace("/ง([0-9a-frlmnok])/i", "\x01$1", $message);
 		$message = mb_convert_encoding($message, "ASCII", "UTF-8");
-		return preg_replace("/\x01([0-9a-frlmnok])/i", "ยง$1", $message);
+		return preg_replace("/\x01([0-9a-frlmnok])/i", "ง$1", $message);
 	}
-	
+
 	public function checkClient() {
 		if (!$this->client->isRunning()) {
 			return;
@@ -190,7 +190,7 @@ class xServerPM extends PluginBase {
 		$messageData = $this->client->messageData;
 		$messageType = $this->client->messageType;
 		$messagePerms = $this->client->messagePerms;
-		
+
 		switch ($messageType) {
 		case -1:
 			return;
@@ -198,7 +198,7 @@ class xServerPM extends PluginBase {
 		case 0:
 			$this->getLogger()->info($messageData);
 			break;
-		
+
 		case 1:
 			$messageData = $this->stripUnicode($messageData);
 			$this->getServer()->getLogger()->info(TextFormat::toANSI($messageData));
@@ -209,7 +209,7 @@ class xServerPM extends PluginBase {
 				$player->sendMessage($messageData);
 			}
 			break;
-		
+
 		case 2:
 			if (preg_match("/" . $this->ignoredCommands . "/i", $messageData)) {
 				break;
@@ -222,5 +222,5 @@ class xServerPM extends PluginBase {
 			$thread->notify();
 		}, $this->client);
 	}
-	
+
 }
