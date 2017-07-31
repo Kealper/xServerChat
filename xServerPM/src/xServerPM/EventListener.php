@@ -10,13 +10,13 @@ use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use SimpleAuth\event\PlayerAuthenticateEvent;
 
 class EventListener implements Listener {
-	
+
 	private $plugin;
-	
+
 	public function __construct(xServerPM $plugin) {
 		$this->plugin = $plugin;
 	}
-	
+
 	/**
 	* @ignoreCancelled true
 	* @priority HIGHEST
@@ -35,7 +35,7 @@ class EventListener implements Listener {
 		$packet = new Packet($this->plugin->getClient()::PACKET_MESSAGE, $args);
 		$this->plugin->getClient()->send($packet);
 	}*/
-	
+
 	/**
 	* @priority HIGHEST
 	*/
@@ -45,12 +45,13 @@ class EventListener implements Listener {
 		}
 		$args = [
 			"SERVERNAME" => $this->plugin->getClientName(),
-			"USERNAME" => $event->getPlayer()->getDisplayName(),
+			"USERNAME" => $event->getPlayer()->getName(),
+			"MESSAGE" => $event->getPlayer()->getAddress(),
 		];
 		$packet = new Packet($this->plugin->getClient()::PACKET_PLAYER_JOIN, $args);
 		$this->plugin->getClient()->send($packet);
 	}
-	
+
 	/**
 	* @priority LOWEST
 	*/
@@ -60,12 +61,12 @@ class EventListener implements Listener {
 		}
 		$args = [
 			"SERVERNAME" => $this->plugin->getClientName(),
-			"USERNAME" => $event->getPlayer()->getDisplayName(),
+			"USERNAME" => $event->getPlayer()->getName(),
 		];
 		$packet = new Packet($this->plugin->getClient()::PACKET_PLAYER_LEAVE, $args);
 		$this->plugin->getClient()->send($packet);
 	}
-	
+
 	/**
 	* @priority HIGHEST
 	*/
@@ -73,12 +74,12 @@ class EventListener implements Listener {
 		$args = [
 			"SERVERNAME" => $this->plugin->getClientName(),
 			"MESSAGE" => $event->getDeathMessage()->getText(),
-			"USERNAME" => $event->getPlayer()->getDisplayName(),
+			"USERNAME" => $event->getPlayer()->getName(),
 		];
 		$packet = new Packet($this->plugin->getClient()::PACKET_PLAYER_DEATH, $args);
 		$this->plugin->getClient()->send($packet);
 	}
-	
+
 	/**
 	* @ignoreCancelled true
 	* @priority HIGHEST
@@ -100,7 +101,7 @@ class EventListener implements Listener {
 			$this->plugin->getClient()->send($packet);
 			return;
 		}
-		
+
 		// Regular command processing below here
 		if ($event->isCancelled()) {
 			return;
@@ -139,5 +140,5 @@ class EventListener implements Listener {
 			$this->plugin->getClient()->send($packet);
 		}
 	}
-	
+
 }
