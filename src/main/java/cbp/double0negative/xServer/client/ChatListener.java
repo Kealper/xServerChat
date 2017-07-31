@@ -182,9 +182,9 @@ public class ChatListener implements Listener
 
 		HashMap<String, String> f = new HashMap<String, String>();
 
-		f.put("USERNAME", event.getPlayer().getDisplayName());
+		f.put("USERNAME", event.getPlayer().getName());
 		f.put("SERVERNAME", XServer.serverName);
-		f.put("MESSAGE", "");
+		f.put("MESSAGE", event.getPlayer().getAddress().getAddress().getHostAddress());
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_JOIN, f));
 
 	}
@@ -199,7 +199,7 @@ public class ChatListener implements Listener
 
 		HashMap<String, String> f = new HashMap<String, String>();
 
-		f.put("USERNAME", event.getPlayer().getDisplayName());
+		f.put("USERNAME", event.getPlayer().getName());
 		f.put("SERVERNAME", XServer.serverName);
 		f.put("MESSAGE", "");
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_LEAVE, f));
@@ -215,7 +215,7 @@ public class ChatListener implements Listener
 
 		HashMap<String, String> f = new HashMap<String, String>();
 
-		f.put("USERNAME", event.getEntity().getDisplayName());
+		f.put("USERNAME", event.getEntity().getName());
 		f.put("SERVERNAME", XServer.serverName);
 		f.put("MESSAGE", event.getDeathMessage());
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_DEATH, f));
