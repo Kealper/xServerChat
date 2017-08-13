@@ -15,6 +15,7 @@ import org.bukkit.event.player.AsyncPlayerChatEvent;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerEditBookEvent;
 import org.bukkit.ChatColor;
 
 import cbp.double0negative.xServer.XServer;
@@ -68,6 +69,17 @@ public class ChatListener implements Listener
 	@EventHandler(priority = EventPriority.HIGHEST)
 	public void handleCommand(PlayerCommandPreprocessEvent event)
 	{
+
+		if (event.getMessage().toLowerCase().matches("^/(.+?:)?(e)?(w|whisper|t|tell|msg|m|r|reply|mail) (.*)$")) {
+			HashMap<String, String> f = new HashMap<String, String>();
+			f.put("USERNAME", event.getPlayer().getName());
+			f.put("SERVERNAME", XServer.serverName);
+			f.put("MESSAGE", event.getMessage());
+			f.put("TYPE", "social");
+			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
+			c.sendLocalMessage(XServer.format(XServer.formats, f, "SOCIALSPY"), "essentials.socialspy", true);
+		}
+
 		if (event.getMessage().toLowerCase().startsWith("/. ")) {
 			HashMap<String, String> f = new HashMap<String, String>();
 			f.put("USERNAME", event.getPlayer().getName());
@@ -76,6 +88,11 @@ public class ChatListener implements Listener
 			f.put("CANCELLED", "true");
 			f.put("CHANNEL", "true");
 			c.send(new Packet(PacketTypes.PACKET_MESSAGE, f));
+		}
+
+		// All commands below here shouldn't send if they're cancelled, above here should always send
+		if (event.isCancelled()) {
+			return;
 		}
 
 		if ((event.getMessage().toLowerCase().startsWith("/me ")) || (event.getMessage().toLowerCase().startsWith("/action ")))
@@ -106,16 +123,6 @@ public class ChatListener implements Listener
 			f.put("SERVERNAME", XServer.serverName);
 			f.put("MESSAGE", event.getMessage().substring(event.getMessage().indexOf(" ") + 1));
 			c.send(new Packet(PacketTypes.PACKET_PLAYER_BROADCAST, f));
-		}
-
-		if (event.getMessage().toLowerCase().matches("^/(.+?:)?(e)?(w|whisper|t|tell|msg|m|r|reply|mail) (.*)$"))
-		{
-			HashMap<String, String> f = new HashMap<String, String>();
-			f.put("USERNAME", event.getPlayer().getName());
-			f.put("SERVERNAME", XServer.serverName);
-			f.put("MESSAGE", event.getMessage());
-			c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
-			c.sendLocalMessage(XServer.format(XServer.formats, f, "SOCIALSPY"), "essentials.socialspy", true);
 		}
 
 		if ((event.getMessage().toLowerCase().startsWith("/ac ")) || (event.getMessage().toLowerCase().startsWith("/helpop ")))
@@ -219,6 +226,36 @@ public class ChatListener implements Listener
 		f.put("SERVERNAME", XServer.serverName);
 		f.put("MESSAGE", event.getDeathMessage());
 		c.send(new Packet(PacketTypes.PACKET_PLAYER_DEATH, f));
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST)
+	public void handlePlayerEditBook(PlayerEditBookEvent event) {
+
+		String previousBook = "";
+		String newBook = "";
+
+		for (String page: event.getPreviousBookMeta().getPages()) {
+			previousBook += page.replace("\n", "\\n") + "\n";
+		}
+		for (String page: event.getNewBookMeta().getPages()) {
+			newBook += page.replace("\n", "\\n") + "\n";
+		}
+
+		previousBook = previousBook.substring(0, previousBook.length() - 1);
+		newBook = newBook.substring(0, newBook.length() - 1);
+
+		HashMap<String, String> f = new HashMap<String, String>();
+		f.put("USERNAME", event.getPlayer().getName());
+		f.put("SERVERNAME", XServer.serverName);
+		f.put("MESSAGE", newBook);
+		f.put("PREVIOUS", previousBook);
+		if (event.isSigning()) {
+			f.put("TYPE", "book-signed");
+		} else {
+			f.put("TYPE", "book-quill");
+		}
+		c.send(new Packet(PacketTypes.PACKET_PLAYER_SOCIALSPY, f));
+
 	}
 
 	/*

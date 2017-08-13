@@ -182,7 +182,9 @@ public class Client extends Thread
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_SOCIALSPY)
 			{
 				Map<String, String> form = (Map<String, String>) p.getArgs();
-				sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy", true);
+				if (form.get("TYPE").equalsIgnoreCase("social")) {
+					sendLocalMessage(XServer.format(p.getFormat(), form, "SOCIALSPY"), "essentials.socialspy", true);
+				}
 			} else if (p.getType() == PacketTypes.PACKET_PLAYER_HELPOP)
 			{
 				Map<String, String> form = (Map<String, String>) p.getArgs();
