@@ -25,7 +25,7 @@ type Client struct {
 }
 
 var (
-	Version    = "1.1.0"
+	Version    = "1.2.0"
 	Clients    = make(map[string] *Client)
 	ClientLock = new(sync.Mutex)
 	LogLevel   = 1
@@ -182,7 +182,16 @@ func handleClient(c *net.TCPConn) {
 				writeLog("[BROADCAST] " + packet.Args["MESSAGE"], 1)
 
 			case PACKET_PLAYER_SOCIALSPY:
-				writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a77" + decolorize(packet.Args["USERNAME"] + "\u00a7f: " + packet.Args["MESSAGE"])), 1)
+				switch strings.ToLower(packet.Args["TYPE"]) {
+				case "book-quill":
+					writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a77" + decolorize(packet.Args["USERNAME"] + "\u00a7f changed book-quill text from \"" + packet.Args["PREVIOUS"] + "\" to \"" + packet.Args["MESSAGE"] +  "\"")), 1)
+
+				case "book-signed":
+					writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a77" + decolorize(packet.Args["USERNAME"] + "\u00a7f changed book-signed text from \"" + packet.Args["PREVIOUS"] + "\" to \"" + packet.Args["MESSAGE"] +  "\"")), 1)
+
+				default: // Catch "social" type or older protocol versions that don't send types
+					writeLog("[" + packet.Args["SERVERNAME"] + "] " + colorize("\u00a77" + decolorize(packet.Args["USERNAME"] + "\u00a7f: " + packet.Args["MESSAGE"])), 1)
+				}
 
 			case PACKET_PLAYER_HELPOP:
 				writeLog("[HelpOp] " + colorize(packet.Args["USERNAME"] + "\u00a7f: " + "\u00a7d" + decolorize(packet.Args["MESSAGE"])), 1)
